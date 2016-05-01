@@ -101,8 +101,7 @@ public class ServerEndpointPPT {
 
     @OnMessage
     public void echoText(String msg, Session s) {
-        
-        System.out.println("MSG es"+msg);
+        System.out.println("MSG es: "+msg);
         try {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
