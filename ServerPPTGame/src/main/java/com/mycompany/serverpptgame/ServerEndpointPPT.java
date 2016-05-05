@@ -49,7 +49,7 @@ import services.ServicesPlayers;
  *
  * @author ivanp
  */
-@ServerEndpoint(value = "/ppt",  configurator=ServletAwareConfig.class)
+@ServerEndpoint(value = "/ppt", configurator = ServletAwareConfig.class)
 public class ServerEndpointPPT {
 
     private static final long TIEMPO_ESPERA_MILLIS = 30000;
@@ -59,7 +59,7 @@ public class ServerEndpointPPT {
     //<editor-fold defaultstate="collapsed" desc="METODOS WEBSOCKET">
     @OnOpen
     public void onOpen(Session s, EndpointConfig config) {
-        this.config=config;
+        this.config = config;
         Player p = new Player();
         p.setNumberOfRounds(RoundsNumber.NONE);
         p.setTipoJuego(GameType.NONE);
@@ -68,7 +68,7 @@ public class ServerEndpointPPT {
         s.getUserProperties().put("player", p);
         s.getUserProperties().put("escogido", false);
         System.out.println("OnOpen");
-        System.out.println("player: "+p);
+        System.out.println("player: " + p);
 //        HttpServletRequest request=(HttpServletRequest)s.getUserProperties().get("request");
 //        HttpServletResponse response=(HttpServletResponse)s.getUserProperties().get("response");
 //        try {
@@ -78,7 +78,7 @@ public class ServerEndpointPPT {
 //        } catch (IOException ex) {
 //            Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
 //        }
-        
+
     }
 
     @OnClose
@@ -101,7 +101,7 @@ public class ServerEndpointPPT {
 
     @OnMessage
     public void echoText(String msg, Session s) {
-        System.out.println("MSG es: "+msg);
+        System.out.println("MSG es: " + msg);
         try {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -114,8 +114,8 @@ public class ServerEndpointPPT {
                     });
                     p.setNumberOfRounds(recogida.getNumberOfRounds());
                     p.setTipoJuego(recogida.getTipoJuego());
-                    String user=(String)s.getUserProperties().get("user");
-                    if(user==null||(user!=null&&!user.equals(recogida.getNamePlayer()))){
+                    String user = (String) s.getUserProperties().get("user");
+                    if (user == null || (user != null && !user.equals(recogida.getNamePlayer()))) {
                         System.out.println("Se mete porque nombre no coincide");
                         s.getUserProperties().put("user", recogida.getNamePlayer());
                     }
@@ -124,23 +124,23 @@ public class ServerEndpointPPT {
                 case PARTIDA:
                     OpcionJuego opcion = mapper.readValue(mapper.writeValueAsString(meta.getContent()), new TypeReference<OpcionJuego>() {
                     });
-                    System.out.println("opcionJuego: "+opcion.getOpcion()+" de: "+p.getNamePlayer());
-                    if(opcion.getResult()!=null&&opcion.getResult()!=Result.EMPATA){
+                    System.out.println("opcionJuego: " + opcion.getOpcion() + " de: " + p.getNamePlayer());
+                    if (opcion.getResult() != null && opcion.getResult() != Result.EMPATA) {
                         HttpSession httpSession = (HttpSession) config.getUserProperties().get("httpSession");
-                        if(opcion.getResult()!=Result.GANA){
+                        if (opcion.getResult() != Result.GANA) {
                             httpSession.setAttribute("player", p);
-                        }else{
-                            Partida partida=(Partida)s.getUserProperties().get("partida");
-                            if((partida.getJugadores().get(0).getNamePlayer()!=p.getNamePlayer())){
+                        } else {
+                            Partida partida = (Partida) s.getUserProperties().get("partida");
+                            if ((partida.getJugadores().get(0).getNamePlayer() != p.getNamePlayer())) {
                                 httpSession.setAttribute("player", partida.getJugadores().get(0).getNamePlayer());
-                            }else{
+                            } else {
                                 httpSession.setAttribute("player", partida.getJugadores().get(1).getNamePlayer());
                             }
                         }
-                        ServletDB sdb=new ServletDB();
-                        HttpServletRequest request=((HttpServletRequest)config.getUserProperties().get("request"));
+                        ServletDB sdb = new ServletDB();
+                        HttpServletRequest request = ((HttpServletRequest) config.getUserProperties().get("request"));
                         request.setAttribute("op", "update");
-                        HttpServletResponse response=(HttpServletResponse)config.getUserProperties().get("response");
+                        HttpServletResponse response = (HttpServletResponse) config.getUserProperties().get("response");
                         sdb.processRequest(request, response);
                     }
                     enviarEleccion(p.getNamePlayer(), opcion, s, mapper, damePartida(s));
@@ -180,7 +180,9 @@ public class ServerEndpointPPT {
         boolean sal = false;
         ArrayList<Session> sesiones = new ArrayList(s.getOpenSessions());
         for (int i = 0; i < sesiones.size() && !sal; i++) {
-            if (((Player) sesiones.get(i).getUserProperties().get("player")).getNamePlayer().equals(nombreObjetivo)) {
+            String playerRevisado = ((Player) sesiones.get(i).getUserProperties().get("player")).getNamePlayer();
+            if (playerRevisado.equals(nombreObjetivo)) {
+                sal = true;
                 MetaMessage mm = new MetaMessage();
                 mm.setType(TypeMessage.RESPUESTA);
                 mm.setContent(opcion);
@@ -188,6 +190,7 @@ public class ServerEndpointPPT {
                 try {
                     mmString = mapper.writeValueAsString(mm);
                     sesiones.get(i).getBasicRemote().sendText(mmString);
+                    System.out.println("Ha entrado y enviado la respuesta");
                 } catch (JsonProcessingException ex) {
                     Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
