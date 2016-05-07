@@ -18,32 +18,21 @@ import com.mycompany.modelpptgame.Partida;
 import com.mycompany.datapptgame.Player;
 import com.mycompany.datapptgame.Result;
 import com.mycompany.datapptgame.RoundsNumber;
-import controller.ControladorBD;
-import dao.Dao;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.websocket.EndpointConfig;
-import javax.websocket.HandshakeResponse;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.server.HandshakeRequest;
 import javax.websocket.server.ServerEndpoint;
-import javax.ws.rs.core.Request;
-import services.ServicesPlayers;
 
 /**
  *
@@ -108,8 +97,10 @@ public class ServerEndpointPPT {
             MetaMessage meta = mapper.readValue(msg, new TypeReference<MetaMessage>() {
             });
             Player p = (Player) s.getUserProperties().get("player");
+            System.out.println("PARTIDA DE: "+p.getNamePlayer()+" es: "+((Partida)s.getUserProperties().get("partida")));
             switch (meta.getType()) {
                 case CONEXION:
+                    System.out.println(p.getNamePlayer()+" entra en "+meta.getType());
                     Player recogida = mapper.readValue(mapper.writeValueAsString(meta.getContent()), new TypeReference<Player>() {
                     });
                     p.setNumberOfRounds(recogida.getNumberOfRounds());
@@ -122,6 +113,7 @@ public class ServerEndpointPPT {
                     search(s, p, mapper);
                     break;
                 case PARTIDA:
+                    System.out.println(p.getNamePlayer()+" entra en "+meta.getType());
                     OpcionJuego opcion = mapper.readValue(mapper.writeValueAsString(meta.getContent()), new TypeReference<OpcionJuego>() {
                     });
                     System.out.println("opcionJuego: " + opcion.getOpcion() + " de: " + p.getNamePlayer());
@@ -146,6 +138,7 @@ public class ServerEndpointPPT {
                     enviarEleccion(p.getNamePlayer(), opcion, s, mapper, damePartida(s));
                     break;
                 case DESCONEXION:
+                    System.out.println(p.getNamePlayer()+" entra en "+meta.getType());
                     Partida partida = (Partida) s.getUserProperties().get("partida");
                     if (partida != null) {
                         int i = 0;
@@ -172,31 +165,35 @@ public class ServerEndpointPPT {
     public void enviarEleccion(String nombre, OpcionJuego opcion, Session s, ObjectMapper mapper, Partida partida) {
         String nombreObjetivo;
         System.out.println("VEAMOS: " + nombre + " buscando y encuentra: " + partida);
-        if (partida.getJugadores().get(0).getNamePlayer().equals(nombre)) {
-            nombreObjetivo = partida.getJugadores().get(1).getNamePlayer();
-        } else {
-            nombreObjetivo = partida.getJugadores().get(0).getNamePlayer();
-        }
-        boolean sal = false;
-        ArrayList<Session> sesiones = new ArrayList(s.getOpenSessions());
-        for (int i = 0; i < sesiones.size() && !sal; i++) {
-            String playerRevisado = ((Player) sesiones.get(i).getUserProperties().get("player")).getNamePlayer();
-            if (playerRevisado.equals(nombreObjetivo)) {
-                sal = true;
-                MetaMessage mm = new MetaMessage();
-                mm.setType(TypeMessage.RESPUESTA);
-                mm.setContent(opcion);
-                String mmString;
-                try {
-                    mmString = mapper.writeValueAsString(mm);
-                    sesiones.get(i).getBasicRemote().sendText(mmString);
-                    System.out.println("Ha entrado y enviado la respuesta");
-                } catch (JsonProcessingException ex) {
-                    Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
+        if (partida != null) {
+            if (partida.getJugadores().get(0).getNamePlayer().equals(nombre)) {
+                nombreObjetivo = partida.getJugadores().get(1).getNamePlayer();
+            } else {
+                nombreObjetivo = partida.getJugadores().get(0).getNamePlayer();
+            }
+            boolean sal = false;
+            ArrayList<Session> sesiones = new ArrayList(s.getOpenSessions());
+            for (int i = 0; i < sesiones.size() && !sal; i++) {
+                String playerRevisado = ((Player) sesiones.get(i).getUserProperties().get("player")).getNamePlayer();
+                if (playerRevisado.equals(nombreObjetivo)) {
+                    sal = true;
+                    MetaMessage mm = new MetaMessage();
+                    mm.setType(TypeMessage.RESPUESTA);
+                    mm.setContent(opcion);
+                    String mmString;
+                    try {
+                        mmString = mapper.writeValueAsString(mm);
+                        sesiones.get(i).getBasicRemote().sendText(mmString);
+                        System.out.println("Ha entrado y enviado la respuesta");
+                    } catch (JsonProcessingException ex) {
+                        Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
+        } else {
+            System.out.println("PARTIDA ES NULL EN \"enviarEleccion\"");
         }
     }
 
@@ -206,6 +203,7 @@ public class ServerEndpointPPT {
         //ArrayList<Session> sessions=new ArrayList(ses.getOpenSessions());
         Iterator it = ses.getOpenSessions().iterator();
         long timeInicial = System.currentTimeMillis();
+        int i = 0;
         while (!sal && (System.currentTimeMillis() - timeInicial < TIEMPO_ESPERA_MILLIS)) {
             Session sessions = null;
             if (!it.hasNext()) {
@@ -220,7 +218,7 @@ public class ServerEndpointPPT {
                      sessions=new ArrayList(ses.getOpenSessions());
                      }*/
                     Player player = (Player) sessions.getUserProperties().get("player");
-                    if (encuentraPartida(player, n)&&!((boolean)ses.getUserProperties().get("escogido"))) {
+                    if (encuentraPartida(player, n) && !((boolean) ses.getUserProperties().get("escogido"))) {
                         ses.getUserProperties().put("escogido", true);
                         if (!(boolean) sessions.getUserProperties().get("escogido")) {
                             sal = true;
@@ -241,8 +239,9 @@ public class ServerEndpointPPT {
                             ses.getUserProperties().put("player", n);
                             sessions.getUserProperties().put("player", player);
                             sessions.getUserProperties().put("partida", p);
-                            sessions.getUserProperties().put("escogido",true);
+                            sessions.getUserProperties().put("escogido", true);
                             System.out.println("SE HA UNIDO A LOS SIGUIENTES JUGADORES: " + player.getNamePlayer() + " y " + n.getNamePlayer());
+                            System.out.println(n.getNamePlayer()+" PARTIDA ES: "+ses.getUserProperties().get("partida"));
                         } else {
                             ses.getUserProperties().put("escogido", false);
                         }
@@ -250,7 +249,12 @@ public class ServerEndpointPPT {
                 } catch (IOException ex) {
                     Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            } else {
+                sal = true;
+                System.out.println("PARTIDA DE: " + n.getNamePlayer() + " está USADA");
+                System.out.println(n.getNamePlayer()+" PARTIDA ES: "+ses.getUserProperties().get("partida"));
             }
+            i++;
         }
         if (!sal) {
             MetaMessage desc = new MetaMessage();
@@ -326,7 +330,7 @@ public class ServerEndpointPPT {
     }
 
     public boolean encuentraPartida(Player player, Player n) {
-        return player!=null&&(!comparaNombres(player.getNamePlayer(), n.getNamePlayer()) && comprobarNone(player) && comprobacionComunRounds(player.getNumberOfRounds(), n.getNumberOfRounds())
+        return player != null && (!comparaNombres(player.getNamePlayer(), n.getNamePlayer()) && comprobarNone(player) && comprobacionComunRounds(player.getNumberOfRounds(), n.getNumberOfRounds())
                 && comprobacionComunGameTypes(player.getTipoJuego(), n.getTipoJuego()) && !player.isPlaying());
     }
     // </editor-fold>
