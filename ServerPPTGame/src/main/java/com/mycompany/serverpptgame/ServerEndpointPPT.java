@@ -206,7 +206,7 @@ public class ServerEndpointPPT {
         //ArrayList<Session> sessions=new ArrayList(ses.getOpenSessions());
         Iterator it = ses.getOpenSessions().iterator();
         long timeInicial = System.currentTimeMillis();
-        for (int i = 0; !sal && (System.currentTimeMillis() - timeInicial < TIEMPO_ESPERA_MILLIS); i++) {
+        while (!sal && (System.currentTimeMillis() - timeInicial < TIEMPO_ESPERA_MILLIS)) {
             Session sessions = null;
             if (!it.hasNext()) {
                 it = ses.getOpenSessions().iterator();
@@ -220,7 +220,7 @@ public class ServerEndpointPPT {
                      sessions=new ArrayList(ses.getOpenSessions());
                      }*/
                     Player player = (Player) sessions.getUserProperties().get("player");
-                    if (encuentraPartida(player, n)) {
+                    if (encuentraPartida(player, n)&&!((boolean)ses.getUserProperties().get("escogido"))) {
                         ses.getUserProperties().put("escogido", true);
                         if (!(boolean) sessions.getUserProperties().get("escogido")) {
                             sal = true;
@@ -241,6 +241,7 @@ public class ServerEndpointPPT {
                             ses.getUserProperties().put("player", n);
                             sessions.getUserProperties().put("player", player);
                             sessions.getUserProperties().put("partida", p);
+                            sessions.getUserProperties().put("escogido",true);
                             System.out.println("SE HA UNIDO A LOS SIGUIENTES JUGADORES: " + player.getNamePlayer() + " y " + n.getNamePlayer());
                         } else {
                             ses.getUserProperties().put("escogido", false);
