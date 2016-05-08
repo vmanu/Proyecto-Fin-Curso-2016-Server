@@ -9,9 +9,6 @@ import config.Configuration;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.sqlite.SQLiteConfig;
 
 /**
@@ -29,7 +26,7 @@ public class DBConnector {
             config.enforceForeignKeys(true);
             connection = DriverManager.getConnection(Configuration.getInstance().getDburl(), config.toProperties());
         } catch (SQLException ex) {
-            System.err.println("Error al abrir la conexión a la base de datos");
+            System.err.println("Error al abrir la conexiÃ³n a la base de datos");
         }
         return connection;
     }
@@ -38,7 +35,7 @@ public class DBConnector {
         try {
             connection.close();
         } catch (SQLException ex) {
-            System.err.println("Error al cerrar la conexión a la base de datos");
+            System.err.println("Error al cerrar la conexiÃ³n a la base de datos");
         }
     }
 }

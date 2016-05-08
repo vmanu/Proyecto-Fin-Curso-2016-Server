@@ -56,6 +56,7 @@ public class ServerEndpointPPT {
         p.setNamePlayer(s.getRequestParameterMap().get("user").get(0));
         s.getUserProperties().put("player", p);
         s.getUserProperties().put("escogido", false);
+        log.info("OnOpen");
         System.out.println("OnOpen");
         System.out.println("player: " + p);
 //        HttpServletRequest request=(HttpServletRequest)s.getUserProperties().get("request");

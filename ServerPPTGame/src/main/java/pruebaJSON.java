@@ -33,7 +33,8 @@ public class pruebaJSON {
             mm.setType(TypeMessage.NOMBRE);
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            System.out.println(mapper.writeValueAsString(mm));
+            String mapperDice=mapper.writeValueAsString(mm);
+            //System.out.println(mapper.writeValueAsString(mm));
         } catch (JsonProcessingException ex) {
             Logger.getLogger(pruebaJSON.class.getName()).log(Level.SEVERE, null, ex);
         }
