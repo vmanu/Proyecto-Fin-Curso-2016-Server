@@ -100,7 +100,7 @@ public class ServerEndpointPPT {
             System.out.println("PARTIDA DE: "+p.getNamePlayer()+" es: "+((Partida)s.getUserProperties().get("partida")));
             switch (meta.getType()) {
                 case CONEXION:
-                    System.out.println(p.getNamePlayer()+" entra en "+meta.getType());
+                    System.out.println(p.getNamePlayer()+" entra en el caso: "+meta.getType());
                     Player recogida = mapper.readValue(mapper.writeValueAsString(meta.getContent()), new TypeReference<Player>() {
                     });
                     p.setNumberOfRounds(recogida.getNumberOfRounds());
@@ -113,7 +113,7 @@ public class ServerEndpointPPT {
                     search(s, p, mapper);
                     break;
                 case PARTIDA:
-                    System.out.println(p.getNamePlayer()+" entra en "+meta.getType());
+                    System.out.println(p.getNamePlayer()+" entra en el caso: "+meta.getType());
                     OpcionJuego opcion = mapper.readValue(mapper.writeValueAsString(meta.getContent()), new TypeReference<OpcionJuego>() {
                     });
                     System.out.println("opcionJuego: " + opcion.getOpcion() + " de: " + p.getNamePlayer());
@@ -138,7 +138,7 @@ public class ServerEndpointPPT {
                     enviarEleccion(p.getNamePlayer(), opcion, s, mapper, damePartida(s));
                     break;
                 case DESCONEXION:
-                    System.out.println(p.getNamePlayer()+" entra en "+meta.getType());
+                    System.out.println(p.getNamePlayer()+" entra en el caso: "+meta.getType());
                     Partida partida = (Partida) s.getUserProperties().get("partida");
                     if (partida != null) {
                         int i = 0;
