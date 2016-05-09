@@ -7,7 +7,7 @@ package config;
 
 
 import java.io.InputStream;
-import org.yaml.snakeyaml.Yaml;
+//import org.yaml.snakeyaml.Yaml;
 
 /**
  *
@@ -22,9 +22,9 @@ public class Configuration {
     {
         if (config == null)
         {
-            Yaml yaml = new Yaml();
+            /*Yaml yaml = new Yaml();
             config = (Configuration)yaml.loadAs(in,Configuration.class);
-            config.pathBase = pathBase;
+            config.pathBase = pathBase;*/
         }
         return config;
     }

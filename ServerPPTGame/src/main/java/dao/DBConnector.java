@@ -9,7 +9,7 @@ import config.Configuration;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import org.sqlite.SQLiteConfig;
+//import org.sqlite.SQLiteConfig;
 
 /**
  *
@@ -21,13 +21,13 @@ public class DBConnector {
     public Connection getConnection() throws ClassNotFoundException {
         Class.forName(DRIVER);
         Connection connection = null;
-        try {
+        /*try {
             SQLiteConfig config = new SQLiteConfig();
             config.enforceForeignKeys(true);
             connection = DriverManager.getConnection(Configuration.getInstance().getDburl(), config.toProperties());
         } catch (SQLException ex) {
             System.err.println("Error al abrir la conexiÃ³n a la base de datos");
-        }
+        }*/
         return connection;
     }
 
