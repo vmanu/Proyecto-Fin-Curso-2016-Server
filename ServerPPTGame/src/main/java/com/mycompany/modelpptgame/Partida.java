@@ -9,8 +9,10 @@ import com.mycompany.datapptgame.Player;
 import java.util.ArrayList;
 
 /**
- *
- * @author ivanp
+ * Gestiona los jugadores implicados en una partida, guardado los objetos Player
+ * que los definen, pudiendo asi acceder con una busqueda a su session y otros
+ * valores que son usados en el servidor
+ * @author Victor e Ivan
  */
 public class Partida {
 
@@ -32,12 +34,19 @@ public class Partida {
         this.jugadores = jugadores;
     }
 
+    /**
+     * Agrega un nuevo player a la lista
+     * @param p 
+     */
     public void addPlayer(Player p) {
         if (jugadores.size() < 2) {
             jugadores.add(p);
         }
     }
     
+    /**
+     * limplia la lista de jugadores
+     */
     public void resetPlayers(){
         jugadores.clear();
     }

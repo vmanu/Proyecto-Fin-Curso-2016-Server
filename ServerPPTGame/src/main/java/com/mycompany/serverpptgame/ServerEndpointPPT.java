@@ -35,8 +35,8 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 /**
- *
- * @author ivanp
+ * Endpoint del Websocket
+ * @author Victor e Ivan
  */
 @ServerEndpoint(value = "/ppt", configurator = ServletAwareConfig.class)
 public class ServerEndpointPPT {
@@ -46,6 +46,11 @@ public class ServerEndpointPPT {
     private static final Logger log = Logger.getGlobal();//LoggerFactory.getLogger(ServerEndpointPPT.class);
 
     //<editor-fold defaultstate="collapsed" desc="METODOS WEBSOCKET">
+    /**
+     * Gestiona la apertura de una nueva sesion (conexion)
+     * @param s
+     * @param config 
+     */
     @OnOpen
     public void onOpen(Session s, EndpointConfig config) {
         this.config = config;
@@ -71,6 +76,11 @@ public class ServerEndpointPPT {
 
     }
 
+    /**
+     * Gestiona el cierre de una session y la comunicacion con todos aquellos a
+     * los que estuviera unido mediante la partida
+     * @param s 
+     */
     @OnClose
     public void onClose(Session s) {
         String seVa = ((Player) s.getUserProperties().get("player")).getNamePlayer();
@@ -89,6 +99,12 @@ public class ServerEndpointPPT {
         }
     }
 
+    /**
+     * Gestiona la recepcion del mensaje, evaluando primero el tipo de mensaje
+     * y en base a ello ejecutando los mensajes respectivos
+     * @param msg
+     * @param s 
+     */
     @OnMessage
     public void echoText(String msg, Session s) {
         System.out.println("MSG es: " + msg);
@@ -159,10 +175,24 @@ public class ServerEndpointPPT {
     //</editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="METODOS FUNCIONALIDADES">
+    /**
+     * Metodo que obtiene la partida guardada en una determinada session
+     * @param s
+     * @return 
+     */
     public Partida damePartida(Session s) {
         return (Partida) s.getUserProperties().get("partida");
     }
 
+    /**
+     * Metodo que se encarga de enviar un mensaje al emparejado del usuario emisor,
+     * obteniendo a la pareja a traves del objeto Partida
+     * @param nombre
+     * @param opcion
+     * @param s
+     * @param mapper
+     * @param partida 
+     */
     public void enviarEleccion(String nombre, OpcionJuego opcion, Session s, ObjectMapper mapper, Partida partida) {
         String nombreObjetivo;
         System.out.println("VEAMOS: " + nombre + " buscando y encuentra: " + partida);
@@ -198,6 +228,13 @@ public class ServerEndpointPPT {
         }
     }
 
+    /**
+     * Busca una pareja de partida al usuario a quien perteneza la session, cumpliendo
+     * unas normas de emparejamiento
+     * @param ses
+     * @param n
+     * @param mapper 
+     */
     public void search(Session ses, Player n, ObjectMapper mapper) {
         Partida p = null;
         boolean sal = false;
@@ -270,6 +307,13 @@ public class ServerEndpointPPT {
         }
     }
 
+    /**
+     * Gestiona el envio del mensaje correspondiente a la pareja del usuario cuya
+     * session ha sido desconectada
+     * @param s
+     * @param nombrePareja
+     * @param mapper 
+     */
     public void cerrarPartidaPorDesconexion(Session s, String nombrePareja, ObjectMapper mapper) {
         boolean sal = false;
         System.out.println("EN CERRARPARTIDADESCON: " + nombrePareja);
@@ -294,42 +338,105 @@ public class ServerEndpointPPT {
     //</editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="CONDICIONES BÚSQUEDA PARTIDA">
+    /**
+     * Evalua si un determinado nombre está entre los jugadores (Player) pertenecientes
+     * a una determinada Partida
+     * @param p
+     * @param name
+     * @return 
+     */
     public boolean compruebaSiNoNombreEnPartida(Partida p, String name) {
         return p == null || !(p != null && (p.getJugadores().get(0).getNamePlayer().equals(name) || p.getJugadores().get(1).getNamePlayer().equals(name)));
     }
 
+    /**
+     * Compara si los dos String recibidos son iguales o no
+     * @param n1
+     * @param n2
+     * @return 
+     */
     public boolean comparaNombres(String n1, String n2) {
         return n1.equals(n2);
     }
 
+    /**
+     * Compara si los dos Enums son iguales o si alguno de los dos es ANY
+     * @param rn1
+     * @param rn2
+     * @return 
+     */
     public boolean comparaRondas(RoundsNumber rn1, RoundsNumber rn2) {
         return rn1 == rn2 || rn1 == RoundsNumber.ANY || rn2 == RoundsNumber.ANY;
     }
 
+    /**
+     * Compara si los dos enums son ANY
+     * @param rn1
+     * @param rn2
+     * @return 
+     */
     public boolean comparaDosAnyRounds(RoundsNumber rn1, RoundsNumber rn2) {
         return rn1 == RoundsNumber.ANY && rn2 == RoundsNumber.ANY;
     }
 
+    /**
+     * Realiza la comprobación de los valores de los Enums para comprobar si se
+     * ajustan entre si
+     * @param rn1
+     * @param rn2
+     * @return 
+     */
     public boolean comprobacionComunRounds(RoundsNumber rn1, RoundsNumber rn2) {
         return (comparaRondas(rn1, rn2) && !comparaDosAnyRounds(rn1, rn2));
     }
 
+    /**
+     * Compara si los dos Enums son iguales o si alguno de los dos es ANY
+     * @param gt1
+     * @param gt2
+     * @return 
+     */
     public boolean comparaGameTypes(GameType gt1, GameType gt2) {
         return gt1 == gt2 || gt1 == GameType.ANY || gt2 == GameType.ANY;
     }
 
+    /**
+     * Compara si los dos enums son ANY
+     * @param gt1
+     * @param gt2
+     * @return 
+     */
     public boolean comparaDosAnyGameTypes(GameType gt1, GameType gt2) {
         return gt1 == GameType.ANY && gt2 == GameType.ANY;
     }
 
+    /**
+     * Realiza la comprobación de los valores de los Enums para comprobar si se
+     * ajustan entre si
+     * @param gt1
+     * @param gt2
+     * @return 
+     */
     public boolean comprobacionComunGameTypes(GameType gt1, GameType gt2) {
         return (comparaGameTypes(gt1, gt2) && !comparaDosAnyGameTypes(gt1, gt2));
     }
 
+    /**
+     * Comprueba si es un Player que NO está buscando juego aún
+     * @param player
+     * @return 
+     */
     public boolean comprobarNone(Player player) {
         return player.getNumberOfRounds() != RoundsNumber.NONE && player.getTipoJuego() != GameType.NONE;
     }
 
+    /**
+     * Conjunto de condiciones para cumplir los requisitos de interconexion entre
+     * dos jugadores
+     * @param player
+     * @param n
+     * @return 
+     */
     public boolean encuentraPartida(Player player, Player n) {
         return player != null && (!comparaNombres(player.getNamePlayer(), n.getNamePlayer()) && comprobarNone(player) && comprobacionComunRounds(player.getNumberOfRounds(), n.getNumberOfRounds())
                 && comprobacionComunGameTypes(player.getTipoJuego(), n.getTipoJuego()) && !player.isPlaying());

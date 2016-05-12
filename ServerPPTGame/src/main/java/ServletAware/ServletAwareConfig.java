@@ -11,8 +11,8 @@ import javax.websocket.server.HandshakeRequest;
 import javax.websocket.server.ServerEndpointConfig;
 
 /**
- *
- * @author Victor
+ * Clase que gestiona la conexion entre servlet y websocket
+ * @author Victor e Ivan
  */
 public class ServletAwareConfig extends ServerEndpointConfig.Configurator {
 
