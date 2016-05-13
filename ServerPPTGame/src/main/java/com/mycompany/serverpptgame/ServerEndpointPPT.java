@@ -61,7 +61,6 @@ public class ServerEndpointPPT {
         p.setNamePlayer(s.getRequestParameterMap().get("user").get(0));
         s.getUserProperties().put("player", p);
         s.getUserProperties().put("escogido", false);
-        log.info("OnOpen");
         System.out.println("OnOpen");
         System.out.println("player: " + p);
 //        HttpServletRequest request=(HttpServletRequest)s.getUserProperties().get("request");
@@ -241,7 +240,6 @@ public class ServerEndpointPPT {
         //ArrayList<Session> sessions=new ArrayList(ses.getOpenSessions());
         Iterator it = ses.getOpenSessions().iterator();
         long timeInicial = System.currentTimeMillis();
-        int i = 0;
         while (!sal && (System.currentTimeMillis() - timeInicial < TIEMPO_ESPERA_MILLIS)) {
             Session sessions = null;
             if (!it.hasNext()) {
@@ -292,7 +290,6 @@ public class ServerEndpointPPT {
                 System.out.println("PARTIDA DE: " + n.getNamePlayer() + " está USADA");
                 System.out.println(n.getNamePlayer()+" PARTIDA ES: "+ses.getUserProperties().get("partida"));
             }
-            i++;
         }
         if (!sal) {
             MetaMessage desc = new MetaMessage();
