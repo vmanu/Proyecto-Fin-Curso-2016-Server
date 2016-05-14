@@ -18,6 +18,8 @@ import com.mycompany.modelpptgame.Partida;
 import com.mycompany.datapptgame.Player;
 import com.mycompany.datapptgame.Result;
 import com.mycompany.datapptgame.RoundsNumber;
+import dao.DBConnector;
+import dao.Dao;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -61,6 +63,8 @@ public class ServerEndpointPPT {
         p.setNamePlayer(s.getRequestParameterMap().get("user").get(0));
         s.getUserProperties().put("player", p);
         s.getUserProperties().put("escogido", false);
+        Dao dao=new Dao();
+        dao.insertPlayer(p);
         System.out.println("OnOpen");
         System.out.println("player: " + p);
 //        HttpServletRequest request=(HttpServletRequest)s.getUserProperties().get("request");

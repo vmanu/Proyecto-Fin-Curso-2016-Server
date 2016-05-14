@@ -17,6 +17,7 @@ public class NewServletListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        System.out.println("CONTEXT INITIALIZED");
         config.Configuration.getInstance(sce.getServletContext().getResourceAsStream("/WEB-INF/config.yml"),
                 sce.getServletContext().getRealPath("/WEB-INF/"));
     }

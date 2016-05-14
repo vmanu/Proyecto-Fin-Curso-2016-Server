@@ -104,16 +104,16 @@ public class Dao {
     }
     
     public boolean insertPlayer(Player p){
+        System.out.println("ENTRAMOS EN INSERT");
         Connection connection=null;
         int ins=0;
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "insert into PLAYERS values (?,?)";
+            String sql = "insert into LOGIN(login) values (?)";
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, p.getNamePlayer());
             //stmt.setString(2, p.getPass());
-            stmt.setInt(2, p.getNumPartidas());
             ins=stmt.executeUpdate();
             //STEP 5: Extract data from result set
         } catch (ClassNotFoundException ex) {
