@@ -44,7 +44,7 @@ public class DBConnector {
             System.out.println("Before get config... ");
             //Configuration config=Configuration.getInstance();
             //System.out.println("Configuration es "+config);
-            String url = String.format("jdbc:mysql:servidor-pptgame.rhcloud.com/phpmyadmin/#PMAURL-16:sql.php?db=PPTGAME");
+            String url = String.format("jdbc:mysql://servidor-pptgame.rhcloud.com:3306/PPTGAME");
             System.out.println("Connecting to... "+url);
             connection=DriverManager.getConnection(url,USERNAME,PASSWORD);
         } catch (SQLException ex) {
