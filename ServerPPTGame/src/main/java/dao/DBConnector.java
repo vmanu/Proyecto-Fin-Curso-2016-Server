@@ -19,19 +19,15 @@ import java.util.logging.Logger;
  */
 public class DBConnector {
     public static final String DRIVER = "com.mysql.jdbc.Driver";
-    private String USERNAME="adminH3ig8b2";
-    private String PASSWORD="bdIuys-gZmKw";
+    private String USERNAME="servidor";
+    private String PASSWORD="server_PPTG@me";
     private String HOST="www.servidor-pptgame.rhcloud.com/phpmyadmin";
     private String PORT="3306";
     private String DBNAME="PPTGAME";
 
     public Connection getConnection() throws ClassNotFoundException {
-        //Class.forName(DRIVER);
-        try {
-            DriverManager.registerDriver(new com.mysql.jdbc.Driver ());
-        } catch (SQLException ex) {
-            Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Class.forName(DRIVER);
+        
         Connection connection = null;
         try {
             /*try {
@@ -44,7 +40,7 @@ public class DBConnector {
             System.out.println("Before get config... ");
             //Configuration config=Configuration.getInstance();
             //System.out.println("Configuration es "+config);
-            String url = String.format("jdbc:mysql://servidor-pptgame.rhcloud.com:3306/PPTGAME");
+            String url = String.format("jdbc:mysql://node7553-servidorpptgame.jelastic.cloudhosted.es/PPTGAME");
             System.out.println("Connecting to... "+url);
             connection=DriverManager.getConnection(url,USERNAME,PASSWORD);
         } catch (SQLException ex) {
