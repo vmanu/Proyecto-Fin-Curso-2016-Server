@@ -28,13 +28,14 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT victories FROM PLAYERS";
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
+            String sql = "SELECT won FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER and log.LOGIN=?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, player);  
+            ResultSet rs=stmt.executeQuery();
             while (rs.next()) {
-                victories = rs.getInt("victories");
+                victories = rs.getInt("won");
             }
-            sql = "UPDATE PLAYERS set victories=? where login=?";
+            sql = "UPDATE DATA_PLAYER dp, LOGIN log set won=? where dp.ID_PLAYER=log.id_player and log.LOGIN=?";
             victories++;
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setInt(1, victories);
@@ -58,7 +59,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT login,pass,victories FROM PLAYERS";
+            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER";
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -79,29 +80,6 @@ public class Dao {
             con.cerrarConexion(connection);
         }
         return players;
-    }
-    
-    public boolean deletePlayer(String n){
-        Connection connection=null;
-        int del=0;
-        DBConnector con = new DBConnector();
-        try {
-            connection = con.getConnection();
-            String sql = "DELETE from PLAYERS where login=?";
-            PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setString(1, n);        
-            del=stmt.executeUpdate();
-            //STEP 5: Extract data from result set
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally
-        {
-            con.cerrarConexion(connection);
-        }
-        return del!=0;
     }
     
     public boolean insertPlayer(Player p){
@@ -137,7 +115,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT login,victories,played FROM DATA_PLAYER ORDER BY won DESC";
+            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER order by won DESC";
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -166,7 +144,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT login,victories,played FROM DATA_PLAYER ORDER BY played DESC";
+            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER order by played DESC";
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -195,7 +173,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT login,victories,played FROM DATA_PLAYER ORDER BY (won/played) DESC";
+            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER order by (won/played) DESC";
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {

@@ -50,9 +50,6 @@ public class ServletDB extends HttpServlet {
                     case "put":
                         sp.insertPlayer(p);
                         break;
-                    case "del":
-                        sp.deletePlayer(p.getNamePlayer());
-                        break;
                     case "update":
                         sp.addVictories(p.getNamePlayer());
                         break;

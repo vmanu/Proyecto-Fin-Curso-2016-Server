@@ -6,6 +6,7 @@
 package services;
 
 import com.mycompany.datapptgame.Player;
+import com.mycompany.datapptgame.User;
 import dao.Dao;
 import java.util.ArrayList;
 
@@ -23,11 +24,23 @@ public class ServicesPlayers {
         return new Dao().getPlayers();
     }
     
-    public boolean deletePlayer(String player){
-        return new Dao().deletePlayer(player);
-    }
-    
     public boolean insertPlayer(Player player){
         return new Dao().insertPlayer(player);
+    }
+    
+    public ArrayList<Player> getPlayersByVictories(){
+        return new Dao().getPlayersByVictories();
+    }
+    
+    public ArrayList<Player> getPlayersByGamesPlayed(){
+        return new Dao().getPlayersByGamesPlayed();
+    }
+    
+    public ArrayList<Player> getPlayersByAverage(){
+        return new Dao().getPlayersByAverage();
+    }
+    
+    public User getUserByLogin(String login, String pass){
+        return new Dao().getUserByLogin(login, pass);
     }
 }
