@@ -110,9 +110,11 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "insert into LOGIN(login) values (?)";
+            String sql = "insert into LOGIN(login,pass,id_player) values (?,?,?)";
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, p.getNamePlayer());
+            stmt.setString(2, "ESTA ES LA PASS DESDE CODIGO");
+            stmt.setInt(3, 1);
             //stmt.setString(2, p.getPass());
             ins=stmt.executeUpdate();
             //STEP 5: Extract data from result set

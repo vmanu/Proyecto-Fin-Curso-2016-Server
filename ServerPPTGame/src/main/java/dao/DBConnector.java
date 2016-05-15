@@ -40,9 +40,10 @@ public class DBConnector {
             System.out.println("Before get config... ");
             //Configuration config=Configuration.getInstance();
             //System.out.println("Configuration es "+config);
-            String url = String.format("jdbc:mysql://node7553-servidorpptgame.jelastic.cloudhosted.es/PPTGAME");
+            String url = "jdbc:mysql://node7553-servidorpptgame.jelastic.cloudhosted.es/PPTGAME";
             System.out.println("Connecting to... "+url);
             connection=DriverManager.getConnection(url,USERNAME,PASSWORD);
+            System.out.println("Conectado= "+connection);
         } catch (SQLException ex) {
             Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
