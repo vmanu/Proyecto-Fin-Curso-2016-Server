@@ -65,7 +65,7 @@ public class Dao {
             while (rs.next()) {
                 String name=rs.getString("login");
                 //String pass=rs.getString("pass");
-                int victories=rs.getInt("victories");
+                int victories=rs.getInt("won");
                 //Player p = new Player(name, pass, victories);
                 Player p = new Player(name, victories);
                 players.add(p);

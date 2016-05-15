@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.datapptgame.Player;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -56,7 +57,8 @@ public class ServletDB extends HttpServlet {
                         sp.addVictories(p.getNamePlayer());
                         break;
                     case "get":
-                        request.setAttribute("players", sp.getPlayers());
+                        ArrayList<Player> players=sp.getPlayers();
+                        request.setAttribute("players", players);
                         response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
                         System.out.println("Saliendo de get");
                         break;
