@@ -6,6 +6,7 @@
 package dao;
 
 import com.mycompany.datapptgame.Player;
+import com.mycompany.datapptgame.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -128,5 +129,119 @@ public class Dao {
             con.cerrarConexion(connection);
         }
         return ins!=0;
+    }
+    
+    public ArrayList<Player> getPlayersByVictories(){
+        ArrayList<Player> players = new ArrayList<>();
+        Connection connection=null;
+        DBConnector con = new DBConnector();
+        try {
+            connection = con.getConnection();
+            String sql = "SELECT login,victories,played FROM DATA_PLAYER ORDER BY won DESC";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                String name=rs.getString("login");
+                //String pass=rs.getString("pass");
+                int victories=rs.getInt("won");
+                //Player p = new Player(name, pass, victories);
+                Player p = new Player(name, victories);
+                players.add(p);
+            }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally
+        {
+            con.cerrarConexion(connection);
+        }
+        return players;
+    }
+    
+    public ArrayList<Player> getPlayersByGamesPlayed(){
+        ArrayList<Player> players = new ArrayList<>();
+        Connection connection=null;
+        DBConnector con = new DBConnector();
+        try {
+            connection = con.getConnection();
+            String sql = "SELECT login,victories,played FROM DATA_PLAYER ORDER BY played DESC";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                String name=rs.getString("login");
+                //String pass=rs.getString("pass");
+                int victories=rs.getInt("won");
+                //Player p = new Player(name, pass, victories);
+                Player p = new Player(name, victories);
+                players.add(p);
+            }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally
+        {
+            con.cerrarConexion(connection);
+        }
+        return players;
+    }
+    
+    public ArrayList<Player> getPlayersByAverage(){
+        ArrayList<Player> players = new ArrayList<>();
+        Connection connection=null;
+        DBConnector con = new DBConnector();
+        try {
+            connection = con.getConnection();
+            String sql = "SELECT login,victories,played FROM DATA_PLAYER ORDER BY (won/played) DESC";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                String name=rs.getString("login");
+                //String pass=rs.getString("pass");
+                int victories=rs.getInt("won");
+                //Player p = new Player(name, pass, victories);
+                Player p = new Player(name, victories);
+                players.add(p);
+            }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally
+        {
+            con.cerrarConexion(connection);
+        }
+        return players;
+    }
+    
+    public User getUserByLogin(String login, String pass){
+        User u=null;
+        Connection connection=null;
+        DBConnector con = new DBConnector();
+        try {
+            connection = con.getConnection();
+            String sql = "SELECT * FROM LOGIN WHERE login=?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, login);  
+            ResultSet rs=stmt.executeQuery();
+            while(rs.next()){
+                String loginU=rs.getString("LOGIN");
+                pass=rs.getString("PASS");
+                u=new User(loginU,pass);
+            }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally
+        {
+            con.cerrarConexion(connection);
+        }
+        return u;
     }
 }
