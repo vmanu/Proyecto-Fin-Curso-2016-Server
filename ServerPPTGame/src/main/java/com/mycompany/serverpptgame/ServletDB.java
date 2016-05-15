@@ -38,23 +38,27 @@ public class ServletDB extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        //response.setContentType("text/html;charset=UTF-8");
+        System.out.println("EN EL SERVLET");
         try {
                 ServicesPlayers sp=new ServicesPlayers();
-                int id=0;
                 ObjectMapper om=new ObjectMapper();
                 om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                Player p=(Player)request.getSession().getAttribute("player");
-                String op = (String)request.getAttribute("op");
+                Player p;
+                String op = (String)request.getParameter("op");
                 switch(op){
                     case "put":
+                        p=(Player)request.getSession().getAttribute("player");
                         sp.insertPlayer(p);
                         break;
                     case "update":
+                        p=(Player)request.getSession().getAttribute("player");
                         sp.addVictories(p.getNamePlayer());
                         break;
                     case "get":
                         request.setAttribute("players", sp.getPlayers());
+                        response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
+                        System.out.println("Saliendo de get");
                         break;
                 }
             } catch (Exception ex) {
