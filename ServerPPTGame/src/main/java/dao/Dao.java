@@ -23,15 +23,15 @@ import java.util.logging.Logger;
 public class Dao {
 
     public boolean addVictories(String player) {
-        Connection connection=null;
-        int ok=0, victories=0;
+        Connection connection = null;
+        int ok = 0, victories = 0;
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
             String sql = "SELECT won FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER and log.LOGIN=?";
             PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setString(1, player);  
-            ResultSet rs=stmt.executeQuery();
+            stmt.setString(1, player);
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 victories = rs.getInt("won");
             }
@@ -40,22 +40,20 @@ public class Dao {
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setInt(1, victories);
             pstmt.setString(2, player);
-            ok=pstmt.executeUpdate();
+            ok = pstmt.executeUpdate();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally
-        {
+        } finally {
             con.cerrarConexion(connection);
         }
-        return ok!=0;
+        return ok != 0;
     }
-    
-    public ArrayList<Player> getPlayers(){
+
+    public ArrayList<Player> getPlayers() {
         ArrayList<Player> players = new ArrayList<>();
-        Connection connection=null;
+        Connection connection = null;
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
@@ -63,9 +61,9 @@ public class Dao {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                String name=rs.getString("login");
+                String name = rs.getString("login");
                 //String pass=rs.getString("pass");
-                int victories=rs.getInt("won");
+                int victories = rs.getInt("won");
                 //Player p = new Player(name, pass, victories);
                 Player p = new Player(name, victories);
                 players.add(p);
@@ -74,44 +72,70 @@ public class Dao {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally
-        {
+        } finally {
             con.cerrarConexion(connection);
         }
         return players;
     }
-    
-    public boolean insertPlayer(Player p){
+
+    public boolean insertPlayer(Player p) {
         System.out.println("ENTRAMOS EN INSERT");
-        Connection connection=null;
-        int ins=0;
+        Connection connection = null;
+        int ins = 0, insDATAP;
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "insert into LOGIN(login,pass,id_player) values (?,?,?)";
+            //NO INSERTAR SI YA EXISTE
+            //SI NO EXISTE, INSERTAR EN DATA_PLAYER Y LUEGO INSERTAR EN LOGIN
+//            String sql = "select login from LOGIN where login=?";
+            String sql = "select login from LOGIN";
             PreparedStatement stmt = connection.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            ArrayList<String> loginsEnBD = new ArrayList();
+//            if(rs.getString("login")!=null){
+//                
+//            }
+//            while (rs.next()) {
+//                String login = rs.getString("login");
+//                loginsEnBD.add(login);
+//            }
+//            if (loginsEnBD.contains(p.getNamePlayer())) {
+//                //YA EXISTE!!
+//            } else {
+            connection.setAutoCommit(false);
+            sql = "INSERT into DATA_PLAYER (won, played, coins) values(0,0,0)";
+            stmt = connection.prepareStatement(sql);
+            insDATAP = stmt.executeUpdate();
+            sql = "SELECT LAST_INSERT_ID()";
+            rs = stmt.executeQuery(sql);
+            int lastId = rs.getInt("ID_PLAYER");
+            sql = "insert into LOGIN(login,pass,id_player) values (?,?,?)";
+            stmt = connection.prepareStatement(sql);
             stmt.setString(1, p.getNamePlayer());
             stmt.setString(2, "ESTA ES LA PASS DESDE CODIGO");
-            stmt.setInt(3, 1);
+            stmt.setInt(3, lastId);
+            ins = stmt.executeUpdate();
+            if (ins == 0) {
+                connection.rollback();
+            }
+            connection.setAutoCommit(true);
+//            }
+
             //stmt.setString(2, p.getPass());
-            ins=stmt.executeUpdate();
             //STEP 5: Extract data from result set
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally
-        {
+        } finally {
             con.cerrarConexion(connection);
         }
-        return ins!=0;
+        return ins != 0;
     }
-    
-    public ArrayList<Player> getPlayersByVictories(){
+
+    public ArrayList<Player> getPlayersByVictories() {
         ArrayList<Player> players = new ArrayList<>();
-        Connection connection=null;
+        Connection connection = null;
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
@@ -119,9 +143,9 @@ public class Dao {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                String name=rs.getString("login");
+                String name = rs.getString("login");
                 //String pass=rs.getString("pass");
-                int victories=rs.getInt("won");
+                int victories = rs.getInt("won");
                 //Player p = new Player(name, pass, victories);
                 Player p = new Player(name, victories);
                 players.add(p);
@@ -130,17 +154,15 @@ public class Dao {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally
-        {
+        } finally {
             con.cerrarConexion(connection);
         }
         return players;
     }
-    
-    public ArrayList<Player> getPlayersByGamesPlayed(){
+
+    public ArrayList<Player> getPlayersByGamesPlayed() {
         ArrayList<Player> players = new ArrayList<>();
-        Connection connection=null;
+        Connection connection = null;
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
@@ -148,9 +170,9 @@ public class Dao {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                String name=rs.getString("login");
+                String name = rs.getString("login");
                 //String pass=rs.getString("pass");
-                int victories=rs.getInt("won");
+                int victories = rs.getInt("won");
                 //Player p = new Player(name, pass, victories);
                 Player p = new Player(name, victories);
                 players.add(p);
@@ -159,17 +181,15 @@ public class Dao {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally
-        {
+        } finally {
             con.cerrarConexion(connection);
         }
         return players;
     }
-    
-    public ArrayList<Player> getPlayersByAverage(){
+
+    public ArrayList<Player> getPlayersByAverage() {
         ArrayList<Player> players = new ArrayList<>();
-        Connection connection=null;
+        Connection connection = null;
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
@@ -177,9 +197,9 @@ public class Dao {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                String name=rs.getString("login");
+                String name = rs.getString("login");
                 //String pass=rs.getString("pass");
-                int victories=rs.getInt("won");
+                int victories = rs.getInt("won");
                 //Player p = new Player(name, pass, victories);
                 Player p = new Player(name, victories);
                 players.add(p);
@@ -188,36 +208,32 @@ public class Dao {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally
-        {
+        } finally {
             con.cerrarConexion(connection);
         }
         return players;
     }
-    
-    public User getUserByLogin(String login, String pass){
-        User u=null;
-        Connection connection=null;
+
+    public User getUserByLogin(String login, String pass) {
+        User u = null;
+        Connection connection = null;
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
             String sql = "SELECT * FROM LOGIN WHERE login=?";
             PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setString(1, login);  
-            ResultSet rs=stmt.executeQuery();
-            while(rs.next()){
-                String loginU=rs.getString("LOGIN");
-                pass=rs.getString("PASS");
-                u=new User(loginU,pass);
+            stmt.setString(1, login);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String loginU = rs.getString("LOGIN");
+                pass = rs.getString("PASS");
+                u = new User(loginU, pass);
             }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally
-        {
+        } finally {
             con.cerrarConexion(connection);
         }
         return u;
