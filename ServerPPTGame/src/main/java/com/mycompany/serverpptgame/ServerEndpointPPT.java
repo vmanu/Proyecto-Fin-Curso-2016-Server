@@ -63,6 +63,7 @@ public class ServerEndpointPPT {
         p.setNamePlayer(s.getRequestParameterMap().get("user").get(0));
         s.getUserProperties().put("player", p);
         s.getUserProperties().put("escogido", false);
+        /////////////////////////
         Dao dao=new Dao();
         dao.insertPlayer(p);
         System.out.println("OnOpen");
