@@ -27,12 +27,11 @@ public class DBConnector {
 
     public Connection getConnection() throws ClassNotFoundException {
         Class.forName(DRIVER);
-        
         Connection connection = null;
         try {
             System.out.println("Before get config... ");
             //String url = "jdbc:mysql://node7553-servidorpptgame.jelastic.cloudhosted.es/PPTGAME";
-            String url = "jdbc:mysql://localhost:9090/PPTGAME";
+            String url = "jdbc:mysql://192.168.1.104/"+DBNAME;
             System.out.println("Connecting to... "+url);
             connection=DriverManager.getConnection(url,USERNAME,PASSWORD);
             System.out.println("Conectado= "+connection);
