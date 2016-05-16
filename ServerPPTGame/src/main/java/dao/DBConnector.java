@@ -30,17 +30,9 @@ public class DBConnector {
         
         Connection connection = null;
         try {
-            /*try {
-            SQLiteConfig config = new SQLiteConfig();
-            config.enforceForeignKeys(true);
-            connection = DriverManager.getConnection(Configuration.getInstance().getDburl(), config.toProperties());
-            } catch (SQLException ex) {
-            System.err.println("Error al abrir la conexiÃ³n a la base de datos");
-            }*/
             System.out.println("Before get config... ");
-            //Configuration config=Configuration.getInstance();
-            //System.out.println("Configuration es "+config);
-            String url = "jdbc:mysql://node7553-servidorpptgame.jelastic.cloudhosted.es/PPTGAME";
+            //String url = "jdbc:mysql://node7553-servidorpptgame.jelastic.cloudhosted.es/PPTGAME";
+            String url = "jdbc:mysql://localhost:9090/PPTGAME";
             System.out.println("Connecting to... "+url);
             connection=DriverManager.getConnection(url,USERNAME,PASSWORD);
             System.out.println("Conectado= "+connection);
