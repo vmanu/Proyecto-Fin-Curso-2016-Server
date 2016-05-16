@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.datapptgame.Player;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,6 +21,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import objetos_seguridad.ClaveComplemento;
+import objetos_seguridad.PasswordHash;
 import services.ServicesPlayers;
 
 /**
@@ -41,7 +45,51 @@ public class ServletDB extends HttpServlet {
             throws ServletException, IOException {
         System.out.println("EN EL SERVLET");
         try {
-                ServicesPlayers sp=new ServicesPlayers();
+            int indexKey=0,indexCompl=0;
+            ServicesPlayers sp=new ServicesPlayers();
+            String keyHasheada=(String)request.getParameter("claveHasheada");
+            String complementoHasheado=(String)request.getParameter("complementoHasheado");
+            System.out.println("KeyHasheada "+keyHasheada);
+            String kc=keyHasheada.concat(complementoHasheado);
+            ClaveComplemento cc=(ClaveComplemento)request.getSession().getAttribute("keysComplements");
+            boolean encontradaKey=false;
+            boolean encontradoCompl=false;
+            String paraCifrar="",key="",complemento="";
+            if(cc.getClaves()!=null){
+                while(indexKey<cc.getClaves().size()&&!encontradaKey){
+                    key=cc.getClaves().get(indexKey);
+                    try {
+                        if(PasswordHash.validatePassword(key,keyHasheada )){
+                            encontradaKey=true;
+                        }else{
+                            indexKey++;
+                        }
+                    } catch (NoSuchAlgorithmException ex) {
+                        Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InvalidKeySpecException ex) {
+                        Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+            if(cc.getComplementos()!=null){
+                while(indexCompl<cc.getComplementos().size()&&!encontradoCompl){
+                    complemento=cc.getComplementos().get(indexCompl);
+                    try {
+                        if(PasswordHash.validatePassword(complemento,complementoHasheado)){
+                            encontradoCompl=true;
+                        }else{
+                            indexCompl++;
+                        }
+                    } catch (NoSuchAlgorithmException ex) {
+                        Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InvalidKeySpecException ex) {
+                        Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+            if(encontradoCompl&&encontradaKey){
+                paraCifrar=key.concat(complemento);
+            }
                 ObjectMapper om=new ObjectMapper();
                 om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 Player p;
@@ -56,8 +104,22 @@ public class ServletDB extends HttpServlet {
                         sp.addVictories(p.getNamePlayer());
                         break;
                     case "get":
-                        ArrayList<Player> players=sp.getPlayers();
-                        request.setAttribute("players", players);
+                        request.setAttribute("players", sp.getPlayers());
+                        response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
+                        System.out.println("Saliendo de get");
+                        break;
+                    case "getByVictories":
+                        request.setAttribute("playersByVictories", sp.getPlayersByVictories());
+                        response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
+                        System.out.println("Saliendo de get");
+                        break;
+                    case "getByRounds":
+                        request.setAttribute("playersByRounds", sp.getPlayersByGamesPlayed());
+                        response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
+                        System.out.println("Saliendo de get");
+                        break;
+                    case "getByAverage":
+                        request.setAttribute("playersByAverage", sp.getPlayersByAverage());
                         response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
                         System.out.println("Saliendo de get");
                         break;
