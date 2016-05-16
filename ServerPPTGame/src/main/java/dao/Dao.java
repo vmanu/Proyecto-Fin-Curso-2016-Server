@@ -104,11 +104,18 @@ public class Dao {
 //            } else {
             connection.setAutoCommit(false);
             sql = "INSERT into DATA_PLAYER (won, played, coins) values(0,0,0)";
-            stmt = connection.prepareStatement(sql);
+            stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             insDATAP = stmt.executeUpdate();
-            sql = "SELECT LAST_INSERT_ID()";
-            rs = stmt.executeQuery(sql);
-            int lastId = rs.getInt("ID_PLAYER");
+            System.out.println("insDATAP " + insDATAP);
+//            sql = "SELECT LAST_INSERT_ID()";
+//            rs = stmt.executeQuery(sql);
+//            int lastId = rs.getInt(1);
+            int lastId = -1;
+            rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                lastId = rs.getInt(1);
+            }
+
             sql = "insert into LOGIN(login,pass,id_player) values (?,?,?)";
             stmt = connection.prepareStatement(sql);
             stmt.setString(1, p.getNamePlayer());
@@ -116,9 +123,9 @@ public class Dao {
             stmt.setInt(3, lastId);
             ins = stmt.executeUpdate();
             if (ins == 0) {
+                System.out.println("ENTRAMOS EN CERO");
                 connection.rollback();
             }
-            connection.setAutoCommit(true);
 //            }
 
             //stmt.setString(2, p.getPass());
@@ -126,8 +133,17 @@ public class Dao {
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                connection.rollback();
+            } catch (SQLException ex1) {
+                Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex1);
+            }
         } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException ex) {
+                Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+            }
             con.cerrarConexion(connection);
         }
         return ins != 0;
