@@ -19,18 +19,17 @@ import java.util.logging.Logger;
  */
 public class DBConnector {
     public static final String DRIVER = "com.mysql.jdbc.Driver";
-    private String USERNAME="servidor";
-    private String PASSWORD="server_PPTG@me";
-    private String HOST="www.servidor-pptgame.rhcloud.com/phpmyadmin";
-    private String PORT="3306";
-    private String DBNAME="PPTGAME";
+    private final String USERNAME="servidor";
+    private final String PASSWORD="server_PPTG@me";
+    private final String HOST="jdbc:mysql://node7553-servidorpptgame.jelastic.cloudhosted.es/";
+    private final String DBNAME="PPTGAME";
 
     public Connection getConnection() throws ClassNotFoundException {
         Class.forName(DRIVER);
         Connection connection = null;
         try {
             System.out.println("Before get config... ");
-            //String url = "jdbc:mysql://node7553-servidorpptgame.jelastic.cloudhosted.es/PPTGAME";
+            //String url = HOST+DBNAME;
             String url = "jdbc:mysql://192.168.1.104/"+DBNAME;
             System.out.println("Connecting to... "+url);
             connection=DriverManager.getConnection(url,USERNAME,PASSWORD);
