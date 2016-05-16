@@ -46,7 +46,7 @@ public class DBConnector {
         try {
             connection.close();
         } catch (SQLException ex) {
-            System.err.println("Error al cerrar la conexiÃ³n a la base de datos");
+            System.err.println("Error al cerrar la conexion a la base de datos");
         }
     }
 }
