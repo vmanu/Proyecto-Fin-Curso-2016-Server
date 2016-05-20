@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.modelpptgame;
+package modelo;
 
 import com.mycompany.datapptgame.Player;
 import java.util.ArrayList;

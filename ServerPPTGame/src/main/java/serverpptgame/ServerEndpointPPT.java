@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.serverpptgame;
+package serverpptgame;
 
 import ServletAware.ServletAwareConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.datapptgame.MetaMessage;
 import com.mycompany.datapptgame.TypeMessage;
 import com.mycompany.datapptgame.GameType;
-import com.mycompany.modelpptgame.Partida;
+import modelo.Partida;
 import com.mycompany.datapptgame.Player;
 import com.mycompany.datapptgame.Result;
 import com.mycompany.datapptgame.RoundsNumber;
