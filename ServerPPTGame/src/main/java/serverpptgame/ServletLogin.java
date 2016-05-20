@@ -75,10 +75,8 @@ public class ServletLogin extends HttpServlet {
 
     private String getClaveCifrado(HttpServletRequest request) {
         int indexKey = 0, indexCompl = 0;
-        ServicesPlayers sp = new ServicesPlayers();
         String keyHasheada = (String) request.getParameter("claveHasheada");
         String complementoHasheado = (String) request.getParameter("complementoHasheado");
-        System.out.println("KeyHasheada " + keyHasheada);
         ClaveComplemento cc = (ClaveComplemento) request.getSession().getAttribute("keysComplements");
         boolean encontradaKey = false;
         boolean encontradoCompl = false;
