@@ -64,8 +64,8 @@ public class ServerEndpointPPT {
         s.getUserProperties().put("player", p);
         s.getUserProperties().put("escogido", false);
         /////////////////////////
-        Dao dao=new Dao();
-        dao.insertPlayer(p);
+//        Dao dao=new Dao();
+//        dao.insertPlayer(p);
         System.out.println("OnOpen");
         System.out.println("player: " + p);
 //        HttpServletRequest request=(HttpServletRequest)s.getUserProperties().get("request");

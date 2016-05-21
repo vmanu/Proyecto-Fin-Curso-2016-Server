@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 import objetos_seguridad.PasswordHash;
 import services.ServicesPlayers;
+import static utilities.Utilidades.getClaveCifrado;
 
 /**
  *
@@ -56,7 +57,6 @@ public class ServletLogin extends HttpServlet {
             });
             System.out.println(user.getLogin() + " --- " + user.getPass());
             User u = sp.getUserByLogin(user.getLogin());
-            //CORRECCION: ASI A MACHETE? SIN PREGUNTAR SI EL RESULTADO HA SIDO NULL?? PORQUE COMO METAS UN LOGIN QUE NO ESTÉ REGISTRADO ES LO QUE VAS A OBTENER... UN BONITO NULLPOINTEREXCEPTION EN EL GLASSFISH por la siguientes lineas, condicionalas a que no sean null, y si es null, pon directamente validate a false y los dos souts que tienes a continuacion, comentalos o peta el que usa al usuario.
             if(u!=null){
                 validated = PasswordHash.validatePassword(user.getPass(), u.getPass());
             }
@@ -72,53 +72,6 @@ public class ServletLogin extends HttpServlet {
         } catch (Exception ex) {
             Logger.getLogger(ServletLogin.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    private String getClaveCifrado(HttpServletRequest request) {
-        int indexKey = 0, indexCompl = 0;
-        String keyHasheada = (String) request.getParameter("claveHasheada");
-        String complementoHasheado = (String) request.getParameter("complementoHasheado");
-        ClaveComplemento cc = (ClaveComplemento) request.getSession().getAttribute("keysComplements");
-        boolean encontradaKey = false;
-        boolean encontradoCompl = false;
-        String paraCifrar = "", key = "", complemento = "";
-        if (cc.getClaves() != null) {
-            while (indexKey < cc.getClaves().size() && !encontradaKey) {
-                key = cc.getClaves().get(indexKey);
-                try {
-                    if (PasswordHash.validatePassword(key, keyHasheada)) {
-                        encontradaKey = true;
-                    } else {
-                        indexKey++;
-                    }
-                } catch (NoSuchAlgorithmException ex) {
-                    Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvalidKeySpecException ex) {
-                    Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-        if (cc.getComplementos() != null) {
-            while (indexCompl < cc.getComplementos().size() && !encontradoCompl) {
-                complemento = cc.getComplementos().get(indexCompl);
-                try {
-                    if (PasswordHash.validatePassword(complemento, complementoHasheado)) {
-                        encontradoCompl = true;
-                    } else {
-                        indexCompl++;
-                    }
-                } catch (NoSuchAlgorithmException ex) {
-                    Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvalidKeySpecException ex) {
-                    Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-        if (encontradoCompl && encontradaKey) {
-            paraCifrar = key + complemento;
-        }
-        System.out.println("PARA CIFRAR ES: "+paraCifrar);
-        return paraCifrar;
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

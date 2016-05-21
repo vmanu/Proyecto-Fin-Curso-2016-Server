@@ -24,7 +24,7 @@ public class ServicesPlayers {
         return new Dao().getPlayers();
     }
     
-    public boolean insertPlayer(Player player){
+    public boolean insertPlayer(User player){
         return new Dao().insertPlayer(player);
     }
     

@@ -78,7 +78,7 @@ public class Dao {
         return players;
     }
 
-    public boolean insertPlayer(Player p) {
+    public boolean insertPlayer(User p) {
         System.out.println("ENTRAMOS EN INSERT");
         Connection connection = null;
         int ins = 0, insDATAP;
@@ -118,8 +118,8 @@ public class Dao {
 
             sql = "insert into LOGIN(login,pass,id_player) values (?,?,?)";
             stmt = connection.prepareStatement(sql);
-            stmt.setString(1, p.getNamePlayer());
-            stmt.setString(2, "ESTA ES LA PASS DESDE CODIGO");
+            stmt.setString(1, p.getLogin());
+            stmt.setString(2, p.getPass());
             stmt.setInt(3, lastId);
             ins = stmt.executeUpdate();
             if (ins == 0) {

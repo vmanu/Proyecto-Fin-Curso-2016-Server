@@ -22,8 +22,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.mycompany.datapptgame.ClaveComplemento;
+import com.mycompany.datapptgame.User;
 import objetos_seguridad.PasswordHash;
+import org.apache.commons.codec.binary.Base64;
 import services.ServicesPlayers;
+import utilities.Utilidades;
+import static utilities.Utilidades.getClaveCifrado;
 
 /**
  *
@@ -46,58 +50,25 @@ public class ServletDB extends HttpServlet {
         System.out.println("EN EL SERVLET");
         response.addHeader("Access-Control-Allow-Origin", "http://localhost:8383");
         try {
-            int indexKey = 0, indexCompl = 0;
-            ServicesPlayers sp = new ServicesPlayers();
-            String keyHasheada = (String) request.getParameter("claveHasheada");
-            String complementoHasheado = (String) request.getParameter("complementoHasheado");
-            System.out.println("KeyHasheada " + keyHasheada);
-            ClaveComplemento cc = (ClaveComplemento) request.getSession().getAttribute("keysComplements");
-            boolean encontradaKey = false;
-            boolean encontradoCompl = false;
-            String paraCifrar = "", key = "", complemento = "";
-            if (cc.getClaves() != null) {
-                while (indexKey < cc.getClaves().size() && !encontradaKey) {
-                    key = cc.getClaves().get(indexKey);
-                    try {
-                        if (PasswordHash.validatePassword(key, keyHasheada)) {
-                            encontradaKey = true;
-                        } else {
-                            indexKey++;
-                        }
-                    } catch (NoSuchAlgorithmException ex) {
-                        Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (InvalidKeySpecException ex) {
-                        Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-            if (cc.getComplementos() != null) {
-                while (indexCompl < cc.getComplementos().size() && !encontradoCompl) {
-                    complemento = cc.getComplementos().get(indexCompl);
-                    try {
-                        if (PasswordHash.validatePassword(complemento, complementoHasheado)) {
-                            encontradoCompl = true;
-                        } else {
-                            indexCompl++;
-                        }
-                    } catch (NoSuchAlgorithmException ex) {
-                        Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (InvalidKeySpecException ex) {
-                        Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-            if (encontradoCompl && encontradaKey) {
-                paraCifrar = key.concat(complemento);
-            }
+            ServicesPlayers sp=new ServicesPlayers();
             ObjectMapper om = new ObjectMapper();
             om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            User u;
             Player p;
             String op = (String) request.getParameter("op");
+            ObjectMapper mapper = new ObjectMapper();
             switch (op) {
                 case "put":
-                    p = (Player) request.getSession().getAttribute("player");
-                    if (sp.insertPlayer(p)) {
+                    String usuarioRaw = request.getParameter("user");
+                    System.out.println("usuarioRAW " + usuarioRaw);
+                    byte[] base64 = Base64.decodeBase64(usuarioRaw.getBytes("UTF-8"));
+                    System.out.println("Base64 " + base64);
+                    String descifrado = PasswordHash.descifra(base64, getClaveCifrado(request));
+                    System.out.println("descifrado: " + descifrado);
+                    u = mapper.readValue(descifrado, new TypeReference<User>() {
+                    });
+                    System.out.println("player dice ser: " + u);
+                    if (sp.insertPlayer(u)) {
                         response.getWriter().write("SI");
                     } else {
                         response.getWriter().write("NO");
@@ -114,17 +85,17 @@ public class ServletDB extends HttpServlet {
 //                    break;
                 case "getByVictories":
                     request.setAttribute("playersByVictories", sp.getPlayersByVictories());
-                    response.getWriter().write("EL GET DEVUELVE " + sp.getPlayers());
+                    response.getWriter().write(mapper.writeValueAsString(sp.getPlayersByVictories()));
                     System.out.println("Saliendo de get");
                     break;
                 case "getByRounds":
                     request.setAttribute("playersByRounds", sp.getPlayersByGamesPlayed());
-                    response.getWriter().write("EL GET DEVUELVE " + sp.getPlayers());
+                    response.getWriter().write(mapper.writeValueAsString(sp.getPlayersByGamesPlayed()));
                     System.out.println("Saliendo de get");
                     break;
                 case "getByAverage":
                     request.setAttribute("playersByAverage", sp.getPlayersByAverage());
-                    response.getWriter().write("EL GET DEVUELVE " + sp.getPlayers());
+                    response.getWriter().write(mapper.writeValueAsString(sp.getPlayersByAverage()));
                     System.out.println("Saliendo de get");
                     break;
             }
