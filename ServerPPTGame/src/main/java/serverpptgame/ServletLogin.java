@@ -42,35 +42,35 @@ public class ServletLogin extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        ServicesPlayers sp=new ServicesPlayers();
+        ServicesPlayers sp = new ServicesPlayers();
         boolean validated = false;
         try {
             User user = null;
             ObjectMapper mapper = new ObjectMapper();
             String userToDecode = request.getParameter("user");
-            System.out.println("USER TO DECODE: "+userToDecode);
+            System.out.println("USER TO DECODE: " + userToDecode);
             byte[] base64 = Base64.decodeBase64(userToDecode.getBytes("UTF-8"));
             System.out.println("Base64 " + base64);
-            String descifrado=PasswordHash.descifra(base64, getClaveCifrado(request));
-            System.out.println("descifrado: "+descifrado);
+            String descifrado = PasswordHash.descifra(base64, getClaveCifrado(request));
+            System.out.println("descifrado: " + descifrado);
             user = mapper.readValue(descifrado, new TypeReference<User>() {
             });
             System.out.println(user.getLogin() + " --- " + user.getPass());
             User u = sp.getUserByLogin(user.getLogin());
-            if(u!=null){
+            if (u != null) {
                 validated = PasswordHash.validatePassword(user.getPass(), u.getPass());
             }
             System.out.println("VALIDATED EN CONTROLLER LOGIN " + validated);
-            if (validated) {
-                request.getSession().setAttribute("login", "true");
-                response.getWriter().print("SI");
-            } else {
-                request.getSession().setAttribute("login", "false");
-                response.getWriter().print("NO");
-            }
             //response.setContentType("text/html;charset=UTF-8");
         } catch (Exception ex) {
             Logger.getLogger(ServletLogin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (validated) {
+            request.getSession().setAttribute("login", "true");
+            response.getWriter().print("SI");
+        } else {
+            request.getSession().setAttribute("login", "false");
+            response.getWriter().print("NO");
         }
     }
 

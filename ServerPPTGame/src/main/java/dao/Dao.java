@@ -7,6 +7,8 @@ package dao;
 
 import com.mycompany.datapptgame.Player;
 import com.mycompany.datapptgame.User;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,6 +17,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import objetos_seguridad.PasswordHash;
 
 /**
  *
@@ -119,7 +122,7 @@ public class Dao {
             sql = "insert into LOGIN(login,pass,id_player) values (?,?,?)";
             stmt = connection.prepareStatement(sql);
             stmt.setString(1, p.getLogin());
-            stmt.setString(2, p.getPass());
+            stmt.setString(2, PasswordHash.createHash(p.getPass()));
             stmt.setInt(3, lastId);
             ins = stmt.executeUpdate();
             if (ins == 0) {
@@ -138,6 +141,10 @@ public class Dao {
             } catch (SQLException ex1) {
                 Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex1);
             }
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeySpecException ex) {
+            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
                 connection.setAutoCommit(true);
