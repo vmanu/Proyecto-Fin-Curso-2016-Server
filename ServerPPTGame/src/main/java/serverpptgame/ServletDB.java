@@ -45,23 +45,22 @@ public class ServletDB extends HttpServlet {
             throws ServletException, IOException {
         System.out.println("EN EL SERVLET");
         try {
-            int indexKey=0,indexCompl=0;
-            ServicesPlayers sp=new ServicesPlayers();
-            String keyHasheada=(String)request.getParameter("claveHasheada");
-            String complementoHasheado=(String)request.getParameter("complementoHasheado");
-            System.out.println("KeyHasheada "+keyHasheada);
-            String kc=keyHasheada.concat(complementoHasheado);
-            ClaveComplemento cc=(ClaveComplemento)request.getSession().getAttribute("keysComplements");
-            boolean encontradaKey=false;
-            boolean encontradoCompl=false;
-            String paraCifrar="",key="",complemento="";
-            if(cc.getClaves()!=null){
-                while(indexKey<cc.getClaves().size()&&!encontradaKey){
-                    key=cc.getClaves().get(indexKey);
+            int indexKey = 0, indexCompl = 0;
+            ServicesPlayers sp = new ServicesPlayers();
+            String keyHasheada = (String) request.getParameter("claveHasheada");
+            String complementoHasheado = (String) request.getParameter("complementoHasheado");
+            System.out.println("KeyHasheada " + keyHasheada);
+            ClaveComplemento cc = (ClaveComplemento) request.getSession().getAttribute("keysComplements");
+            boolean encontradaKey = false;
+            boolean encontradoCompl = false;
+            String paraCifrar = "", key = "", complemento = "";
+            if (cc.getClaves() != null) {
+                while (indexKey < cc.getClaves().size() && !encontradaKey) {
+                    key = cc.getClaves().get(indexKey);
                     try {
-                        if(PasswordHash.validatePassword(key,keyHasheada )){
-                            encontradaKey=true;
-                        }else{
+                        if (PasswordHash.validatePassword(key, keyHasheada)) {
+                            encontradaKey = true;
+                        } else {
                             indexKey++;
                         }
                     } catch (NoSuchAlgorithmException ex) {
@@ -71,13 +70,13 @@ public class ServletDB extends HttpServlet {
                     }
                 }
             }
-            if(cc.getComplementos()!=null){
-                while(indexCompl<cc.getComplementos().size()&&!encontradoCompl){
-                    complemento=cc.getComplementos().get(indexCompl);
+            if (cc.getComplementos() != null) {
+                while (indexCompl < cc.getComplementos().size() && !encontradoCompl) {
+                    complemento = cc.getComplementos().get(indexCompl);
                     try {
-                        if(PasswordHash.validatePassword(complemento,complementoHasheado)){
-                            encontradoCompl=true;
-                        }else{
+                        if (PasswordHash.validatePassword(complemento, complementoHasheado)) {
+                            encontradoCompl = true;
+                        } else {
                             indexCompl++;
                         }
                     } catch (NoSuchAlgorithmException ex) {
@@ -87,46 +86,50 @@ public class ServletDB extends HttpServlet {
                     }
                 }
             }
-            if(encontradoCompl&&encontradaKey){
-                paraCifrar=key.concat(complemento);
+            if (encontradoCompl && encontradaKey) {
+                paraCifrar = key.concat(complemento);
             }
-                ObjectMapper om=new ObjectMapper();
-                om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                Player p;
-                String op = (String)request.getParameter("op");
-                switch(op){
-                    case "put":
-                        p=(Player)request.getSession().getAttribute("player");
-                        sp.insertPlayer(p);
-                        break;
-                    case "update":
-                        p=(Player)request.getSession().getAttribute("player");
-                        sp.addVictories(p.getNamePlayer());
-                        break;
-                    case "get":
-                        request.setAttribute("players", sp.getPlayers());
-                        response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
-                        System.out.println("Saliendo de get");
-                        break;
-                    case "getByVictories":
-                        request.setAttribute("playersByVictories", sp.getPlayersByVictories());
-                        response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
-                        System.out.println("Saliendo de get");
-                        break;
-                    case "getByRounds":
-                        request.setAttribute("playersByRounds", sp.getPlayersByGamesPlayed());
-                        response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
-                        System.out.println("Saliendo de get");
-                        break;
-                    case "getByAverage":
-                        request.setAttribute("playersByAverage", sp.getPlayersByAverage());
-                        response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
-                        System.out.println("Saliendo de get");
-                        break;
-                }
-            } catch (Exception ex) {
-                Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
+            ObjectMapper om = new ObjectMapper();
+            om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            Player p;
+            String op = (String) request.getParameter("op");
+            switch (op) {
+                case "put":
+                    p = (Player) request.getSession().getAttribute("player");
+                    if (sp.insertPlayer(p)) {
+                        response.getWriter().write("SI");
+                    } else {
+                        response.getWriter().write("NO");
+                    }
+                    break;
+                case "update":
+                    p = (Player) request.getSession().getAttribute("player");
+                    sp.addVictories(p.getNamePlayer());
+                    break;
+//                case "get":
+//                    request.setAttribute("players", sp.getPlayers());
+//                    response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
+//                    System.out.println("Saliendo de get");
+//                    break;
+                case "getByVictories":
+                    request.setAttribute("playersByVictories", sp.getPlayersByVictories());
+                    response.getWriter().write("EL GET DEVUELVE " + sp.getPlayers());
+                    System.out.println("Saliendo de get");
+                    break;
+                case "getByRounds":
+                    request.setAttribute("playersByRounds", sp.getPlayersByGamesPlayed());
+                    response.getWriter().write("EL GET DEVUELVE " + sp.getPlayers());
+                    System.out.println("Saliendo de get");
+                    break;
+                case "getByAverage":
+                    request.setAttribute("playersByAverage", sp.getPlayersByAverage());
+                    response.getWriter().write("EL GET DEVUELVE " + sp.getPlayers());
+                    System.out.println("Saliendo de get");
+                    break;
             }
+        } catch (Exception ex) {
+            Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
