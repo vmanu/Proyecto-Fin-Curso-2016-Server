@@ -44,6 +44,7 @@ public class ServletDB extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         System.out.println("EN EL SERVLET");
+        response.addHeader("Access-Control-Allow-Origin", "http://localhost:8383");
         try {
             int indexKey = 0, indexCompl = 0;
             ServicesPlayers sp = new ServicesPlayers();

@@ -230,7 +230,7 @@ public class Dao {
         return players;
     }
 
-    public User getUserByLogin(String login, String pass) {
+    public User getUserByLogin(String login) {
         User u = null;
         Connection connection = null;
         DBConnector con = new DBConnector();
@@ -242,7 +242,7 @@ public class Dao {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 String loginU = rs.getString("LOGIN");
-                pass = rs.getString("PASS");
+                String pass = rs.getString("PASS");
                 u = new User(loginU, pass);
             }
         } catch (ClassNotFoundException ex) {

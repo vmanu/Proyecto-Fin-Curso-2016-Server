@@ -40,7 +40,7 @@ public class ServicesPlayers {
         return new Dao().getPlayersByAverage();
     }
     
-    public User getUserByLogin(String login, String pass){
-        return new Dao().getUserByLogin(login, pass);
+    public User getUserByLogin(String login){
+        return new Dao().getUserByLogin(login);
     }
 }

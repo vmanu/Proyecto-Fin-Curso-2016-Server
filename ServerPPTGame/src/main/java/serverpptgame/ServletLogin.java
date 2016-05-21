@@ -9,11 +9,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.datapptgame.ClaveComplemento;
 import com.mycompany.datapptgame.User;
-import dao.Dao;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -43,23 +41,26 @@ public class ServletLogin extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Dao dao = new Dao();
+        ServicesPlayers sp=new ServicesPlayers();
         boolean validated = false;
         try {
             User user = null;
             ObjectMapper mapper = new ObjectMapper();
             String userToDecode = request.getParameter("user");
+            System.out.println("USER TO DECODE: "+userToDecode);
             byte[] base64 = Base64.decodeBase64(userToDecode.getBytes("UTF-8"));
-            System.out.println("PASS PARA CIFRAR USERS " + (String) request.getSession().getAttribute("passLogin"));
-            user = mapper.readValue(PasswordHash.descifra(base64, (String) request.getSession().getAttribute("passLogin")), new TypeReference<User>() {
+            System.out.println("Base64 " + base64);
+            String descifrado=PasswordHash.descifra(base64, getClaveCifrado(request));
+            System.out.println("descifrado: "+descifrado);
+            user = mapper.readValue(descifrado, new TypeReference<User>() {
             });
             System.out.println(user.getLogin() + " --- " + user.getPass());
-            User u = dao.getUserByLogin(user.getLogin(), user.getPass());
+            User u = sp.getUserByLogin(user.getLogin());
             //CORRECCION: ASI A MACHETE? SIN PREGUNTAR SI EL RESULTADO HA SIDO NULL?? PORQUE COMO METAS UN LOGIN QUE NO ESTÉ REGISTRADO ES LO QUE VAS A OBTENER... UN BONITO NULLPOINTEREXCEPTION EN EL GLASSFISH por la siguientes lineas, condicionalas a que no sean null, y si es null, pon directamente validate a false y los dos souts que tienes a continuacion, comentalos o peta el que usa al usuario.
-            validated = PasswordHash.validatePassword(user.getPass(), u.getPass());
+            if(u!=null){
+                validated = PasswordHash.validatePassword(user.getPass(), u.getPass());
+            }
             System.out.println("VALIDATED EN CONTROLLER LOGIN " + validated);
-            //CORRECCION: ESTO PUEDE PETAR (USAS U sin comprobar si null
-            System.out.println("user es" + u.getLogin() + " " + u.getPass());
             if (validated) {
                 request.getSession().setAttribute("login", "true");
                 response.getWriter().print("SI");
@@ -116,6 +117,7 @@ public class ServletLogin extends HttpServlet {
         if (encontradoCompl && encontradaKey) {
             paraCifrar = key + complemento;
         }
+        System.out.println("PARA CIFRAR ES: "+paraCifrar);
         return paraCifrar;
     }
 
