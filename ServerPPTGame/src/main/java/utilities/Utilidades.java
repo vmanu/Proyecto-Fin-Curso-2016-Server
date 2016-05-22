@@ -30,6 +30,8 @@ public class Utilidades {
         String keyHasheada = (String) request.getParameter("claveHasheada");
         String complementoHasheado = (String) request.getParameter("complementoHasheado");
         ClaveComplemento cc = (ClaveComplemento) request.getSession().getAttribute("keysComplements");
+        System.out.println("mapper: "+mapper+" o request: "+request);
+        System.out.println(" o el parameter "+request.getParameter("claveComplemento"));
         if(cc==null){
             try {
                 cc=mapper.readValue(request.getParameter("claveComplemento"), new TypeReference<ClaveComplemento>() {});

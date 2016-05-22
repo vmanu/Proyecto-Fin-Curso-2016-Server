@@ -5,7 +5,10 @@
  */
 package serverpptgame;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mycompany.datapptgame.User;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
@@ -18,6 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import objetos_seguridad.PasswordHash;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  *
@@ -38,18 +42,33 @@ public class ServletHashingJS extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.addHeader("Access-Control-Allow-Origin", "http://localhost:8383");
-        String clave=request.getParameter("clave");
-        String complemento=request.getParameter("complemento");
-        String [] envia=new String[2];
-        try {
-            envia[0]=PasswordHash.createHash(clave);
-            envia[1]=PasswordHash.createHash(complemento);
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(ServletHashingJS.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvalidKeySpecException ex) {
-            Logger.getLogger(ServletHashingJS.class.getName()).log(Level.SEVERE, null, ex);
+        String op = request.getParameter("op");
+        switch (op) {
+            case "claves":
+                String clave = request.getParameter("clave");
+                String complemento = request.getParameter("complemento");
+                String[] envia = new String[2];
+                try {
+                    envia[0] = PasswordHash.createHash(clave);
+                    envia[1] = PasswordHash.createHash(complemento);
+                } catch (NoSuchAlgorithmException ex) {
+                    Logger.getLogger(ServletHashingJS.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvalidKeySpecException ex) {
+                    Logger.getLogger(ServletHashingJS.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                response.getWriter().write(new ObjectMapper().writeValueAsString(envia));
+                break;
+            case "user":
+                String claveHasheo = request.getParameter("fraseHash");
+                String devuelve = "";
+                try {
+                    devuelve = new String(Base64.encodeBase64(PasswordHash.cifra(request.getParameter("user"), claveHasheo)));
+                } catch (Exception ex) {
+                    Logger.getLogger(ServletHashingJS.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                response.getWriter().write(new ObjectMapper().writeValueAsString(devuelve));
+                break;
         }
-        response.getWriter().write(new ObjectMapper().writeValueAsString(envia));
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
