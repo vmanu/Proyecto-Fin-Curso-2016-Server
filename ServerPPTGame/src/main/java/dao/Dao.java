@@ -182,7 +182,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER order by won DESC";
+            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER order by won DESC LIMIT 10";
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -209,7 +209,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER order by played DESC";
+            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER order by played DESC LIMIT 10";
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -236,7 +236,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER order by (won/played) DESC";
+            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER order by (won/played) DESC LIMIT 10";
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
