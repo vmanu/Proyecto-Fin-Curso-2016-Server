@@ -5,7 +5,11 @@
  */
 package utilities;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.datapptgame.ClaveComplemento;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.logging.Level;
@@ -21,9 +25,18 @@ import serverpptgame.ServletDB;
 public class Utilidades {
     public static String getClaveCifrado(HttpServletRequest request) {
         int indexKey = 0, indexCompl = 0;
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String keyHasheada = (String) request.getParameter("claveHasheada");
         String complementoHasheado = (String) request.getParameter("complementoHasheado");
         ClaveComplemento cc = (ClaveComplemento) request.getSession().getAttribute("keysComplements");
+        if(cc==null){
+            try {
+                cc=mapper.readValue(request.getParameter("claveComplemento"), new TypeReference<ClaveComplemento>() {});
+            } catch (IOException ex) {
+                Logger.getLogger(Utilidades.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         boolean encontradaKey = false;
         boolean encontradoCompl = false;
         String paraCifrar = "", key = "", complemento = "";
