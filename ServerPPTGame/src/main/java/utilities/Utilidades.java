@@ -51,9 +51,7 @@ public class Utilidades {
                     } else {
                         indexKey++;
                     }
-                } catch (NoSuchAlgorithmException ex) {
-                    Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvalidKeySpecException ex) {
+                } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
                     Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -67,11 +65,9 @@ public class Utilidades {
                     } else {
                         indexCompl++;
                     }
-                } catch (NoSuchAlgorithmException ex) {
+                } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
                     Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvalidKeySpecException ex) {
-                    Logger.getLogger(ServletDB.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                } 
             }
         }
         if (encontradoCompl && encontradaKey) {

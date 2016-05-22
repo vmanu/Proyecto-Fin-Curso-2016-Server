@@ -170,9 +170,7 @@ public class ServerEndpointPPT {
                     }
                     break;
             }
-        } catch (IOException ex) {
-            Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ServletException ex) {
+        } catch (IOException | ServletException ex) {
             Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

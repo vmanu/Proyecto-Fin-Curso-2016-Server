@@ -140,7 +140,7 @@ public class Dao {
 
             //stmt.setString(2, p.getPass());
             //STEP 5: Extract data from result set
-        } catch (ClassNotFoundException ex) {
+        } catch (ClassNotFoundException | NoSuchAlgorithmException | InvalidKeySpecException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
 //            try {
@@ -164,10 +164,6 @@ public class Dao {
                     Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex1);
                 }
             }
-            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvalidKeySpecException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
 //            try {

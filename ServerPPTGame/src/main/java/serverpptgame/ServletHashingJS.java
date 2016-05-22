@@ -51,9 +51,7 @@ public class ServletHashingJS extends HttpServlet {
                 try {
                     envia[0] = PasswordHash.createHash(clave);
                     envia[1] = PasswordHash.createHash(complemento);
-                } catch (NoSuchAlgorithmException ex) {
-                    Logger.getLogger(ServletHashingJS.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvalidKeySpecException ex) {
+                } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
                     Logger.getLogger(ServletHashingJS.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 response.getWriter().write(new ObjectMapper().writeValueAsString(envia));
