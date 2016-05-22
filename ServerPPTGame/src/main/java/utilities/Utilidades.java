@@ -26,7 +26,6 @@ public class Utilidades {
         ClaveComplemento cc = (ClaveComplemento) request.getSession().getAttribute("keysComplements");
         boolean encontradaKey = false;
         boolean encontradoCompl = false;
-        System.out.println("recibimos en clavecifrado: "+keyHasheada+" . . "+complementoHasheado+" . . "+cc);
         String paraCifrar = "", key = "", complemento = "";
         if (cc.getClaves() != null) {
             while (indexKey < cc.getClaves().size() && !encontradaKey) {
