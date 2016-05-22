@@ -43,6 +43,7 @@ public class ServletLogin extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         ServicesPlayers sp = new ServicesPlayers();
+        response.addHeader("Access-Control-Allow-Origin", "http://localhost:8383");
         boolean validated = false;
         try {
             User user = null;
