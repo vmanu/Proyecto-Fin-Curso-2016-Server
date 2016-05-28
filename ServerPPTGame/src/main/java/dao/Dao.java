@@ -68,7 +68,8 @@ public class Dao {
                 //String pass=rs.getString("pass");
                 int victories = rs.getInt("won");
                 //Player p = new Player(name, pass, victories);
-                Player p = new Player(name, victories);
+                int numPartidas = rs.getInt("played");
+                Player p = new Player(name, numPartidas, victories);
                 players.add(p);
             }
         } catch (ClassNotFoundException ex) {
@@ -189,8 +190,9 @@ public class Dao {
                 String name = rs.getString("login");
                 //String pass=rs.getString("pass");
                 int victories = rs.getInt("won");
+                int numPartidas = rs.getInt("played");
                 //Player p = new Player(name, pass, victories);
-                Player p = new Player(name, victories);
+                Player p = new Player(name, numPartidas, victories);
                 players.add(p);
             }
         } catch (ClassNotFoundException ex) {
@@ -216,8 +218,9 @@ public class Dao {
                 String name = rs.getString("login");
                 //String pass=rs.getString("pass");
                 int victories = rs.getInt("won");
+                int numPartidas = rs.getInt("played");
                 //Player p = new Player(name, pass, victories);
-                Player p = new Player(name, victories);
+                Player p = new Player(name, numPartidas, victories);
                 players.add(p);
             }
         } catch (ClassNotFoundException ex) {
@@ -244,7 +247,8 @@ public class Dao {
                 //String pass=rs.getString("pass");
                 int victories = rs.getInt("won");
                 //Player p = new Player(name, pass, victories);
-                Player p = new Player(name, victories);
+                int numPartidas = rs.getInt("played");
+                Player p = new Player(name, numPartidas, victories);
                 players.add(p);
             }
         } catch (ClassNotFoundException ex) {
