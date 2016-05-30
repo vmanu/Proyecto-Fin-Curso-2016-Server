@@ -20,6 +20,10 @@ public class ServicesPlayers {
         return new Dao().addVictories(player);
     }
     
+    public boolean addRounds(String player){
+        return new Dao().addRounds(player);
+    }
+    
     public ArrayList<Player> getPlayers(){
         return new Dao().getPlayers();
     }
