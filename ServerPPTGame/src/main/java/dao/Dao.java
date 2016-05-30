@@ -53,6 +53,35 @@ public class Dao {
         }
         return ok != 0;
     }
+    
+    public boolean addRounds(String player) {
+        Connection connection = null;
+        int ok = 0, rounds = 0;
+        DBConnector con = new DBConnector();
+        try {
+            connection = con.getConnection();
+            String sql = "SELECT won FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER and log.LOGIN=?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, player);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                rounds = rs.getInt("played");
+            }
+            sql = "UPDATE DATA_PLAYER dp, LOGIN log set played=? where dp.ID_PLAYER=log.id_player and log.LOGIN=?";
+            rounds++;
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            pstmt.setInt(1, rounds);
+            pstmt.setString(2, player);
+            ok = pstmt.executeUpdate();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            con.cerrarConexion(connection);
+        }
+        return ok != 0;
+    }
 
     public ArrayList<Player> getPlayers() {
         ArrayList<Player> players = new ArrayList<>();
