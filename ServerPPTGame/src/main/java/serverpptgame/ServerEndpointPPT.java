@@ -18,6 +18,7 @@ import modelo.Partida;
 import com.mycompany.datapptgame.Player;
 import com.mycompany.datapptgame.Result;
 import com.mycompany.datapptgame.RoundsNumber;
+import static constantes.conexion.ConstantesConexion.*;
 import dao.DBConnector;
 import dao.Dao;
 import java.io.IOException;
@@ -60,7 +61,7 @@ public class ServerEndpointPPT {
         p.setNumberOfRounds(RoundsNumber.NONE);
         p.setTipoJuego(GameType.NONE);
         p.setPlaying(false);
-        p.setNamePlayer(s.getRequestParameterMap().get("user").get(0));
+        p.setNamePlayer(s.getRequestParameterMap().get(USER).get(0));
         s.getUserProperties().put("player", p);
         s.getUserProperties().put("escogido", false);
         /////////////////////////
