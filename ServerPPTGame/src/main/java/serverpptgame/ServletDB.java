@@ -74,7 +74,11 @@ public class ServletDB extends HttpServlet {
                         response.getWriter().write("NO");
                     }
                     break;
-                case "update":
+                case "addRounds":
+                    p = (Player) request.getSession().getAttribute("player");
+                    sp.addRounds(p.getNamePlayer());
+                    break;
+                case "addVictories":
                     p = (Player) request.getSession().getAttribute("player");
                     sp.addVictories(p.getNamePlayer());
                     break;
