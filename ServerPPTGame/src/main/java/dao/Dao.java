@@ -60,7 +60,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT won FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER and log.LOGIN=?";
+            String sql = "SELECT played FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER and log.LOGIN=?";
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, player);
             ResultSet rs = stmt.executeQuery();

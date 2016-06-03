@@ -157,9 +157,10 @@ public class ServerEndpointPPT {
                                 //httpSession.setAttribute("player", partida.getJugadores().get(1).getNamePlayer());
                                 nombreRival = partida.getJugadores().get(1).getNamePlayer();
                             }
+                            System.out.println("el nombre del que envia el mensaje es: "+p.getNamePlayer()+" el nombre del rival es: "+nombreRival);
                             dbController.addRounds(p.getNamePlayer());
                             dbController.addRounds(nombreRival);
-                            if (opcion.getResult() != Result.GANA) {
+                            if (opcion.getResult() == Result.GANA) {
                                 //httpSession.setAttribute("player", p);
                                 dbController.addVictories(p.getNamePlayer());
                             } else {
