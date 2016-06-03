@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.mycompany.datapptgame.ClaveComplemento;
+import static constantes.ConstantesServer.*;
 
 /**
  *
@@ -35,7 +36,7 @@ public class ServletSeguridad extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.addHeader("Access-Control-Allow-Origin", "http://localhost:8383");
+        response.addHeader(PERMISSION_ACCESS_JAVASCRIPT, LOCATION_ACCESS_JAVASCRIPT);
         SeguridadDAO dao = new SeguridadDAO();
         //CORRECCION: AQUI FALTARIA CONTROLAR QUE EL USUARIO HA HECHO LOGIN
         ArrayList<String> complementos = (ArrayList<String>) request.getSession().getAttribute("compls");

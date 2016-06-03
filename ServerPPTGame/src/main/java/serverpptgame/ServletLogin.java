@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.datapptgame.ClaveComplemento;
 import com.mycompany.datapptgame.User;
+import static constantes.ConstantesServer.*;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -43,7 +44,7 @@ public class ServletLogin extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         ServicesPlayers sp = new ServicesPlayers();
-        response.addHeader("Access-Control-Allow-Origin", "http://localhost:8383");
+        response.addHeader(PERMISSION_ACCESS_JAVASCRIPT, LOCATION_ACCESS_JAVASCRIPT);
         boolean validated = false;
         try {
             User user = null;

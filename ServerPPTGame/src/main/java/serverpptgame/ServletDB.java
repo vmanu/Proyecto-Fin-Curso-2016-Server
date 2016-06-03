@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.mycompany.datapptgame.ClaveComplemento;
 import com.mycompany.datapptgame.User;
+import static constantes.ConstantesServer.*;
+import static constantes.conexion.ConstantesConexion.*;
 import objetos_seguridad.PasswordHash;
 import org.apache.commons.codec.binary.Base64;
 import services.ServicesPlayers;
@@ -47,21 +49,20 @@ public class ServletDB extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("EN EL SERVLET");
-        response.addHeader("Access-Control-Allow-Origin", "http://localhost:8383");
+        response.addHeader(PERMISSION_ACCESS_JAVASCRIPT, LOCATION_ACCESS_JAVASCRIPT);
         try {
             ServicesPlayers sp=new ServicesPlayers();
             ObjectMapper om = new ObjectMapper();
             om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             User u;
             Player p;
-            String op = (String) request.getParameter("op");
+            String op = (String) request.getParameter(OPERATION_OPTION);
             ObjectMapper mapper = new ObjectMapper();
             switch (op) {
-                case "put":
-                    String usuarioRaw = request.getParameter("user");
+                case URL_AGREGAR_USUARIO:
+                    String usuarioRaw = request.getParameter(USER);
                     System.out.println("usuarioRAW " + usuarioRaw);
-                    byte[] base64 = Base64.decodeBase64(usuarioRaw.getBytes("UTF-8"));
+                    byte[] base64 = Base64.decodeBase64(usuarioRaw.getBytes(UTF_8));
                     System.out.println("Base64 " + base64);
                     String descifrado = PasswordHash.descifra(base64, getClaveCifrado(request));
                     System.out.println("descifrado: " + descifrado);
@@ -69,38 +70,32 @@ public class ServletDB extends HttpServlet {
                     });
                     System.out.println("player dice ser: " + u);
                     if (sp.insertPlayer(u)) {
-                        response.getWriter().write("SI");
+                        response.getWriter().write(SI);
                     } else {
-                        response.getWriter().write("NO");
+                        response.getWriter().write(NO);
                     }
                     break;
-                case "addRounds":
-                    p = (Player) request.getSession().getAttribute("player");
-                    sp.addRounds(p.getNamePlayer());
-                    break;
-                case "addVictories":
-                    p = (Player) request.getSession().getAttribute("player");
-                    sp.addVictories(p.getNamePlayer());
-                    break;
+//                case "addRounds":
+//                    p = (Player) request.getSession().getAttribute("player");
+//                    sp.addRounds(p.getNamePlayer());
+//                    break;
+//                case "addVictories":
+//                    p = (Player) request.getSession().getAttribute("player");
+//                    sp.addVictories(p.getNamePlayer());
+//                    break;
 //                case "get":
 //                    request.setAttribute("players", sp.getPlayers());
 //                    response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
 //                    System.out.println("Saliendo de get");
 //                    break;
-                case "getByVictories":
-                    request.setAttribute("playersByVictories", sp.getPlayersByVictories());
+                case URL_GET_BY_VICTORIES:
                     response.getWriter().write(mapper.writeValueAsString(sp.getPlayersByVictories()));
-                    System.out.println("Saliendo de get");
                     break;
-                case "getByRounds":
-                    request.setAttribute("playersByRounds", sp.getPlayersByGamesPlayed());
+                case URL_GET_BY_ROUNDS:
                     response.getWriter().write(mapper.writeValueAsString(sp.getPlayersByGamesPlayed()));
-                    System.out.println("Saliendo de get");
                     break;
-                case "getByAverage":
-                    request.setAttribute("playersByAverage", sp.getPlayersByAverage());
+                case URL_GET_BY_AVERAGE:
                     response.getWriter().write(mapper.writeValueAsString(sp.getPlayersByAverage()));
-                    System.out.println("Saliendo de get");
                     break;
             }
         } catch (Exception ex) {
