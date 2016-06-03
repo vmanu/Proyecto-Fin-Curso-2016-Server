@@ -36,9 +36,11 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+import services.ServicesPlayers;
 
 /**
  * Endpoint del Websocket
+ *
  * @author Victor e Ivan
  */
 @ServerEndpoint(value = "/ppt", configurator = ServletAwareConfig.class)
@@ -51,8 +53,9 @@ public class ServerEndpointPPT {
     //<editor-fold defaultstate="collapsed" desc="METODOS WEBSOCKET">
     /**
      * Gestiona la apertura de una nueva sesion (conexion)
+     *
      * @param s
-     * @param config 
+     * @param config
      */
     @OnOpen
     public void onOpen(Session s, EndpointConfig config) {
@@ -84,7 +87,8 @@ public class ServerEndpointPPT {
     /**
      * Gestiona el cierre de una session y la comunicacion con todos aquellos a
      * los que estuviera unido mediante la partida
-     * @param s 
+     *
+     * @param s
      */
     @OnClose
     public void onClose(Session s) {
@@ -105,10 +109,11 @@ public class ServerEndpointPPT {
     }
 
     /**
-     * Gestiona la recepcion del mensaje, evaluando primero el tipo de mensaje
-     * y en base a ello ejecutando los mensajes respectivos
+     * Gestiona la recepcion del mensaje, evaluando primero el tipo de mensaje y
+     * en base a ello ejecutando los mensajes respectivos
+     *
      * @param msg
-     * @param s 
+     * @param s
      */
     @OnMessage
     public void echoText(String msg, Session s) {
@@ -119,10 +124,10 @@ public class ServerEndpointPPT {
             MetaMessage meta = mapper.readValue(msg, new TypeReference<MetaMessage>() {
             });
             Player p = (Player) s.getUserProperties().get("player");
-            System.out.println("PARTIDA DE: "+p.getNamePlayer()+" es: "+((Partida)s.getUserProperties().get("partida")));
+            System.out.println("PARTIDA DE: " + p.getNamePlayer() + " es: " + ((Partida) s.getUserProperties().get("partida")));
             switch (meta.getType()) {
                 case CONEXION:
-                    System.out.println(p.getNamePlayer()+" entra en el caso: "+meta.getType());
+                    System.out.println(p.getNamePlayer() + " entra en el caso: " + meta.getType());
                     Player recogida = mapper.readValue(mapper.writeValueAsString(meta.getContent()), new TypeReference<Player>() {
                     });
                     p.setNumberOfRounds(recogida.getNumberOfRounds());
@@ -135,32 +140,42 @@ public class ServerEndpointPPT {
                     search(s, p, mapper);
                     break;
                 case PARTIDA:
-                    System.out.println(p.getNamePlayer()+" entra en el caso: "+meta.getType());
+                    System.out.println(p.getNamePlayer() + " entra en el caso: " + meta.getType());
                     OpcionJuego opcion = mapper.readValue(mapper.writeValueAsString(meta.getContent()), new TypeReference<OpcionJuego>() {
                     });
                     System.out.println("opcionJuego: " + opcion.getOpcion() + " de: " + p.getNamePlayer());
                     if (opcion.getResult() != null && opcion.getResult() != Result.EMPATA) {
-                        HttpSession httpSession = (HttpSession) config.getUserProperties().get("httpSession");
-                        if (opcion.getResult() != Result.GANA) {
-                            httpSession.setAttribute("player", p);
-                        } else {
-                            Partida partida = (Partida) s.getUserProperties().get("partida");
-                            if ((partida.getJugadores().get(0).getNamePlayer() != p.getNamePlayer())) {
-                                httpSession.setAttribute("player", partida.getJugadores().get(0).getNamePlayer());
+                        //HttpSession httpSession = (HttpSession) config.getUserProperties().get("httpSession");
+                        ServicesPlayers dbController = new ServicesPlayers();
+                        Partida partida = (Partida) s.getUserProperties().get("partida");
+                        if (partida != null) {
+                            String nombreRival;
+                            if ((!partida.getJugadores().get(0).getNamePlayer().equals(p.getNamePlayer()))) {
+                                //httpSession.setAttribute("player", partida.getJugadores().get(0).getNamePlayer());
+                                nombreRival = partida.getJugadores().get(0).getNamePlayer();
                             } else {
-                                httpSession.setAttribute("player", partida.getJugadores().get(1).getNamePlayer());
+                                //httpSession.setAttribute("player", partida.getJugadores().get(1).getNamePlayer());
+                                nombreRival = partida.getJugadores().get(1).getNamePlayer();
+                            }
+                            dbController.addRounds(p.getNamePlayer());
+                            dbController.addRounds(nombreRival);
+                            if (opcion.getResult() != Result.GANA) {
+                                //httpSession.setAttribute("player", p);
+                                dbController.addVictories(p.getNamePlayer());
+                            } else {
+                                dbController.addVictories(nombreRival);
                             }
                         }
-                        ServletDB sdb = new ServletDB();
-                        HttpServletRequest request = ((HttpServletRequest) config.getUserProperties().get("request"));
-                        request.setAttribute("op", "update");
-                        HttpServletResponse response = (HttpServletResponse) config.getUserProperties().get("response");
-                        sdb.processRequest(request, response);
+//                        ServletDB sdb = new ServletDB();
+//                        HttpServletRequest request = ((HttpServletRequest) config.getUserProperties().get("request"));
+//                        request.setAttribute("op", "update");
+//                        HttpServletResponse response = (HttpServletResponse) config.getUserProperties().get("response");
+//                        sdb.processRequest(request, response);
                     }
                     enviarEleccion(p.getNamePlayer(), opcion, s, mapper, damePartida(s));
                     break;
                 case DESCONEXION:
-                    System.out.println(p.getNamePlayer()+" entra en el caso: "+meta.getType());
+                    System.out.println(p.getNamePlayer() + " entra en el caso: " + meta.getType());
                     Partida partida = (Partida) s.getUserProperties().get("partida");
                     if (partida != null) {
                         int i = 0;
@@ -171,7 +186,7 @@ public class ServerEndpointPPT {
                     }
                     break;
             }
-        } catch (IOException | ServletException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -180,21 +195,23 @@ public class ServerEndpointPPT {
     // <editor-fold defaultstate="collapsed" desc="METODOS FUNCIONALIDADES">
     /**
      * Metodo que obtiene la partida guardada en una determinada session
+     *
      * @param s
-     * @return 
+     * @return
      */
     public Partida damePartida(Session s) {
         return (Partida) s.getUserProperties().get("partida");
     }
 
     /**
-     * Metodo que se encarga de enviar un mensaje al emparejado del usuario emisor,
-     * obteniendo a la pareja a traves del objeto Partida
+     * Metodo que se encarga de enviar un mensaje al emparejado del usuario
+     * emisor, obteniendo a la pareja a traves del objeto Partida
+     *
      * @param nombre
      * @param opcion
      * @param s
      * @param mapper
-     * @param partida 
+     * @param partida
      */
     public void enviarEleccion(String nombre, OpcionJuego opcion, Session s, ObjectMapper mapper, Partida partida) {
         String nombreObjetivo;
@@ -232,11 +249,12 @@ public class ServerEndpointPPT {
     }
 
     /**
-     * Busca una pareja de partida al usuario a quien perteneza la session, cumpliendo
-     * unas normas de emparejamiento
+     * Busca una pareja de partida al usuario a quien perteneza la session,
+     * cumpliendo unas normas de emparejamiento
+     *
      * @param ses
      * @param n
-     * @param mapper 
+     * @param mapper
      */
     public void search(Session ses, Player n, ObjectMapper mapper) {
         Partida p = null;
@@ -281,7 +299,7 @@ public class ServerEndpointPPT {
                             sessions.getUserProperties().put("partida", p);
                             sessions.getUserProperties().put("escogido", true);
                             System.out.println("SE HA UNIDO A LOS SIGUIENTES JUGADORES: " + player.getNamePlayer() + " y " + n.getNamePlayer());
-                            System.out.println(n.getNamePlayer()+" PARTIDA ES: "+ses.getUserProperties().get("partida"));
+                            System.out.println(n.getNamePlayer() + " PARTIDA ES: " + ses.getUserProperties().get("partida"));
                         } else {
                             ses.getUserProperties().put("escogido", false);
                         }
@@ -292,7 +310,7 @@ public class ServerEndpointPPT {
             } else {
                 sal = true;
                 System.out.println("PARTIDA DE: " + n.getNamePlayer() + " está USADA");
-                System.out.println(n.getNamePlayer()+" PARTIDA ES: "+ses.getUserProperties().get("partida"));
+                System.out.println(n.getNamePlayer() + " PARTIDA ES: " + ses.getUserProperties().get("partida"));
             }
         }
         if (!sal) {
@@ -309,11 +327,12 @@ public class ServerEndpointPPT {
     }
 
     /**
-     * Gestiona el envio del mensaje correspondiente a la pareja del usuario cuya
-     * session ha sido desconectada
+     * Gestiona el envio del mensaje correspondiente a la pareja del usuario
+     * cuya session ha sido desconectada
+     *
      * @param s
      * @param nombrePareja
-     * @param mapper 
+     * @param mapper
      */
     public void cerrarPartidaPorDesconexion(Session s, String nombrePareja, ObjectMapper mapper) {
         boolean sal = false;
@@ -340,11 +359,12 @@ public class ServerEndpointPPT {
 
     // <editor-fold defaultstate="collapsed" desc="CONDICIONES BÚSQUEDA PARTIDA">
     /**
-     * Evalua si un determinado nombre está entre los jugadores (Player) pertenecientes
-     * a una determinada Partida
+     * Evalua si un determinado nombre está entre los jugadores (Player)
+     * pertenecientes a una determinada Partida
+     *
      * @param p
      * @param name
-     * @return 
+     * @return
      */
     public boolean compruebaSiNoNombreEnPartida(Partida p, String name) {
         return p == null || !(p != null && (p.getJugadores().get(0).getNamePlayer().equals(name) || p.getJugadores().get(1).getNamePlayer().equals(name)));
@@ -352,9 +372,10 @@ public class ServerEndpointPPT {
 
     /**
      * Compara si los dos String recibidos son iguales o no
+     *
      * @param n1
      * @param n2
-     * @return 
+     * @return
      */
     public boolean comparaNombres(String n1, String n2) {
         return n1.equals(n2);
@@ -362,9 +383,10 @@ public class ServerEndpointPPT {
 
     /**
      * Compara si los dos Enums son iguales o si alguno de los dos es ANY
+     *
      * @param rn1
      * @param rn2
-     * @return 
+     * @return
      */
     public boolean comparaRondas(RoundsNumber rn1, RoundsNumber rn2) {
         return rn1 == rn2 || rn1 == RoundsNumber.ANY || rn2 == RoundsNumber.ANY;
@@ -372,9 +394,10 @@ public class ServerEndpointPPT {
 
     /**
      * Compara si los dos enums son ANY
+     *
      * @param rn1
      * @param rn2
-     * @return 
+     * @return
      */
     public boolean comparaDosAnyRounds(RoundsNumber rn1, RoundsNumber rn2) {
         return rn1 == RoundsNumber.ANY && rn2 == RoundsNumber.ANY;
@@ -383,9 +406,10 @@ public class ServerEndpointPPT {
     /**
      * Realiza la comprobación de los valores de los Enums para comprobar si se
      * ajustan entre si
+     *
      * @param rn1
      * @param rn2
-     * @return 
+     * @return
      */
     public boolean comprobacionComunRounds(RoundsNumber rn1, RoundsNumber rn2) {
         return (comparaRondas(rn1, rn2) && !comparaDosAnyRounds(rn1, rn2));
@@ -393,9 +417,10 @@ public class ServerEndpointPPT {
 
     /**
      * Compara si los dos Enums son iguales o si alguno de los dos es ANY
+     *
      * @param gt1
      * @param gt2
-     * @return 
+     * @return
      */
     public boolean comparaGameTypes(GameType gt1, GameType gt2) {
         return gt1 == gt2 || gt1 == GameType.ANY || gt2 == GameType.ANY;
@@ -403,9 +428,10 @@ public class ServerEndpointPPT {
 
     /**
      * Compara si los dos enums son ANY
+     *
      * @param gt1
      * @param gt2
-     * @return 
+     * @return
      */
     public boolean comparaDosAnyGameTypes(GameType gt1, GameType gt2) {
         return gt1 == GameType.ANY && gt2 == GameType.ANY;
@@ -414,9 +440,10 @@ public class ServerEndpointPPT {
     /**
      * Realiza la comprobación de los valores de los Enums para comprobar si se
      * ajustan entre si
+     *
      * @param gt1
      * @param gt2
-     * @return 
+     * @return
      */
     public boolean comprobacionComunGameTypes(GameType gt1, GameType gt2) {
         return (comparaGameTypes(gt1, gt2) && !comparaDosAnyGameTypes(gt1, gt2));
@@ -424,19 +451,21 @@ public class ServerEndpointPPT {
 
     /**
      * Comprueba si es un Player que NO está buscando juego aún
+     *
      * @param player
-     * @return 
+     * @return
      */
     public boolean comprobarNone(Player player) {
         return player.getNumberOfRounds() != RoundsNumber.NONE && player.getTipoJuego() != GameType.NONE;
     }
 
     /**
-     * Conjunto de condiciones para cumplir los requisitos de interconexion entre
-     * dos jugadores
+     * Conjunto de condiciones para cumplir los requisitos de interconexion
+     * entre dos jugadores
+     *
      * @param player
      * @param n
-     * @return 
+     * @return
      */
     public boolean encuentraPartida(Player player, Player n) {
         return player != null && (!comparaNombres(player.getNamePlayer(), n.getNamePlayer()) && comprobarNone(player) && comprobacionComunRounds(player.getNumberOfRounds(), n.getNumberOfRounds())
