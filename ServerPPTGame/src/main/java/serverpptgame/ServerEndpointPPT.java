@@ -157,7 +157,7 @@ public class ServerEndpointPPT {
                                 //httpSession.setAttribute("player", partida.getJugadores().get(1).getNamePlayer());
                                 nombreRival = partida.getJugadores().get(1).getNamePlayer();
                             }
-                            System.out.println("el nombre del que envia el mensaje es: "+p.getNamePlayer()+" el nombre del rival es: "+nombreRival);
+                            System.out.println("el nombre del que envia el mensaje es: " + p.getNamePlayer() + " el nombre del rival es: " + nombreRival);
                             dbController.addRounds(p.getNamePlayer());
                             dbController.addRounds(nombreRival);
                             if (opcion.getResult() == Result.GANA) {
@@ -280,6 +280,37 @@ public class ServerEndpointPPT {
                     if (encuentraPartida(player, n) && !((boolean) ses.getUserProperties().get("escogido"))) {
                         ses.getUserProperties().put("escogido", true);
                         if (!(boolean) sessions.getUserProperties().get("escogido")) {
+                            sessions.getUserProperties().put("escogido", true);
+                            if (n.getNumberOfRounds() == RoundsNumber.ANY) {
+                                boolean ambosRandoms = false;
+                                if (comparaDosAnyGameTypes(player.getTipoJuego(), n.getTipoJuego())) {
+                                    //AMBOS SON RANDOMS
+                                    n.setNumberOfRounds(RoundsNumber.values()[((int) (Math.random() * 3))]);
+                                    n.setTipoJuego(GameType.values()[((int) (Math.random() * 3))]);
+                                    ambosRandoms = true;
+                                } else {
+                                    //SOLO n ES RANDOM
+                                    n.setNumberOfRounds(player.getNumberOfRounds());
+                                    n.setTipoJuego(player.getTipoJuego());
+                                }
+                                MetaMessage mm = new MetaMessage();
+                                mm.setType(TypeMessage.CONFIGURACION);
+                                mm.setContent(n);
+                                String mmString = mapper.writeValueAsString(mm);
+                                ses.getBasicRemote().sendText(mmString);
+                                if (ambosRandoms) {
+                                    sessions.getBasicRemote().sendText(mmString);
+                                }
+                            } else if (player.getNumberOfRounds() == RoundsNumber.ANY) {
+                                //SOLO player ES RANDOM
+                                player.setNumberOfRounds(n.getNumberOfRounds());
+                                player.setTipoJuego(n.getTipoJuego());
+                                MetaMessage mm = new MetaMessage();
+                                mm.setType(TypeMessage.CONFIGURACION);
+                                mm.setContent(n);
+                                String mmString = mapper.writeValueAsString(mm);
+                                sessions.getBasicRemote().sendText(mmString);
+                            }
                             sal = true;
                             p = new Partida();
                             p.addPlayer(player);
@@ -298,7 +329,6 @@ public class ServerEndpointPPT {
                             ses.getUserProperties().put("player", n);
                             sessions.getUserProperties().put("player", player);
                             sessions.getUserProperties().put("partida", p);
-                            sessions.getUserProperties().put("escogido", true);
                             System.out.println("SE HA UNIDO A LOS SIGUIENTES JUGADORES: " + player.getNamePlayer() + " y " + n.getNamePlayer());
                             System.out.println(n.getNamePlayer() + " PARTIDA ES: " + ses.getUserProperties().get("partida"));
                         } else {
@@ -447,7 +477,7 @@ public class ServerEndpointPPT {
      * @return
      */
     public boolean comprobacionComunGameTypes(GameType gt1, GameType gt2) {
-        return (comparaGameTypes(gt1, gt2) && !comparaDosAnyGameTypes(gt1, gt2));
+        return comparaGameTypes(gt1, gt2);
     }
 
     /**
