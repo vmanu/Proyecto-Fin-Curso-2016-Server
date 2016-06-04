@@ -282,14 +282,17 @@ public class ServerEndpointPPT {
                         if (!(boolean) sessions.getUserProperties().get("escogido")) {
                             sessions.getUserProperties().put("escogido", true);
                             if (n.getNumberOfRounds() == RoundsNumber.ANY) {
+                                System.out.println("ENTRA EN QUE EL PRIMERO ES ANY");
                                 boolean ambosRandoms = false;
                                 if (comparaDosAnyGameTypes(player.getTipoJuego(), n.getTipoJuego())) {
                                     //AMBOS SON RANDOMS
+                                    System.out.println("EN AMBOS SON RANDOMS");
                                     n.setNumberOfRounds(RoundsNumber.values()[((int) (Math.random() * 3))]);
                                     n.setTipoJuego(GameType.values()[((int) (Math.random() * 3))]);
                                     ambosRandoms = true;
                                 } else {
                                     //SOLO n ES RANDOM
+                                    System.out.println("ENTRA EN QUE EL SOLO EL PRIMERO ES RANDOM");
                                     n.setNumberOfRounds(player.getNumberOfRounds());
                                     n.setTipoJuego(player.getTipoJuego());
                                 }
@@ -297,12 +300,14 @@ public class ServerEndpointPPT {
                                 mm.setType(TypeMessage.CONFIGURACION);
                                 mm.setContent(n);
                                 String mmString = mapper.writeValueAsString(mm);
+                                System.out.println("EN AL MENOS UNO ES RANDOM, EL OBJETO ES: "+mmString);
                                 ses.getBasicRemote().sendText(mmString);
                                 if (ambosRandoms) {
                                     sessions.getBasicRemote().sendText(mmString);
                                 }
                             } else if (player.getNumberOfRounds() == RoundsNumber.ANY) {
                                 //SOLO player ES RANDOM
+                                System.out.println("ENTRA EN SOLO EL SEGUNDO ES RANDOM");
                                 player.setNumberOfRounds(n.getNumberOfRounds());
                                 player.setTipoJuego(n.getTipoJuego());
                                 MetaMessage mm = new MetaMessage();
@@ -443,7 +448,7 @@ public class ServerEndpointPPT {
      * @return
      */
     public boolean comprobacionComunRounds(RoundsNumber rn1, RoundsNumber rn2) {
-        return (comparaRondas(rn1, rn2) && !comparaDosAnyRounds(rn1, rn2));
+        return (comparaRondas(rn1, rn2));
     }
 
     /**
