@@ -13,4 +13,10 @@ public class ConstantesServer {
     public static final String LOCATION_ACCESS_JAVASCRIPT="http://localhost:8383";
     public static final String PERMISSION_ACCESS_JAVASCRIPT="Access-Control-Allow-Origin";
     public static final String OPERATION_OPTION="op";
+    public static final String CLAVES="claves";
+    public static final String PLAYER="player";
+    public static final String ESCOGIDO="escogido";
+    public static final String PARTIDA="partida";
+    
+    
 }

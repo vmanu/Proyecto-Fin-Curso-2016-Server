@@ -16,13 +16,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.mycompany.datapptgame.ClaveComplemento;
+import static constantes.ConstantesConexion.NAME_SERVLET_SEGURIDAD;
+import static constantes.ConstantesConexion.RUTA_SERVLET_SEGURIDAD;
 import static constantes.ConstantesServer.*;
 
 /**
  *
  * @author dam2
  */
-@WebServlet(name = "ControllerSeguridad", urlPatterns = {"/seguridad"})
+@WebServlet(name = NAME_SERVLET_SEGURIDAD, urlPatterns = {RUTA_SERVLET_SEGURIDAD})
 public class ServletSeguridad extends HttpServlet {
 
     /**

@@ -5,6 +5,8 @@
  */
 package dao;
 
+import static constantes.ConstantesBaseDatos.SELECT_CLAVES_SECURITY;
+import static constantes.ConstantesBaseDatos.SELECT_COMPLEMENTOS_SECURITY;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,7 +27,7 @@ public class SeguridadDAO {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT * FROM POSIBLES_CLAVES";
+            String sql = SELECT_CLAVES_SECURITY;
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             //STEP 5: Extract data from result set
@@ -51,7 +53,7 @@ public class SeguridadDAO {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT * FROM POSIBLES_COMPLEMENTO";
+            String sql = SELECT_COMPLEMENTOS_SECURITY;
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             //STEP 5: Extract data from result set

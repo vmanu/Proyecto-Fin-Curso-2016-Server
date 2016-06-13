@@ -7,6 +7,7 @@ package dao;
 
 import com.mycompany.datapptgame.Player;
 import com.mycompany.datapptgame.User;
+import static constantes.ConstantesBaseDatos.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
@@ -31,14 +32,14 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT won FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER and log.LOGIN=?";
+            String sql = SELECT_ADD_VICTORIES;
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, player);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 victories = rs.getInt("won");
             }
-            sql = "UPDATE DATA_PLAYER dp, LOGIN log set won=? where dp.ID_PLAYER=log.id_player and log.LOGIN=?";
+            sql = UPDATE_ADD_VICTORIES;
             victories++;
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setInt(1, victories);
@@ -60,14 +61,14 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT played FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER and log.LOGIN=?";
+            String sql = SELECT_ADD_ROUNDS;
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, player);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 rounds = rs.getInt("played");
             }
-            sql = "UPDATE DATA_PLAYER dp, LOGIN log set played=? where dp.ID_PLAYER=log.id_player and log.LOGIN=?";
+            sql = UPDATE_ADD_ROUNDS;
             rounds++;
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setInt(1, rounds);
@@ -89,7 +90,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER";
+            String sql = SELECT_GET_PLAYERS;
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -126,10 +127,10 @@ public class Dao {
             //NO INSERTAR SI YA EXISTE
             //SI NO EXISTE, INSERTAR EN DATA_PLAYER Y LUEGO INSERTAR EN LOGIN
 //            String sql = "select login from LOGIN where login=?";
-            sql = "select login from LOGIN";
+            sql = SELECT_INSERT_PLAYERS;
             stmt = connection.prepareStatement(sql);
             rs = stmt.executeQuery();
-            ArrayList<String> loginsEnBD = new ArrayList();
+//            ArrayList<String> loginsEnBD = new ArrayList();
 //            if(rs.getString("login")!=null){
 //                
 //            }
@@ -141,7 +142,7 @@ public class Dao {
 //                //YA EXISTE!!
 //            } else {
 //            connection.setAutoCommit(false);
-            sql = "INSERT into DATA_PLAYER (won, played, coins) values(0,0,0)";
+            sql = INSERT_DATA_PLAYER;
             stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             insDATAP = stmt.executeUpdate();
             System.out.println("insDATAP " + insDATAP);
@@ -155,7 +156,7 @@ public class Dao {
             }
             ingresadoDataPlayer = true;
             System.out.println("lastID "+lastId);
-            sql = "insert into LOGIN(login,pass,id_player) values (?,?,?)";
+            sql = INSERT_PLAYER;
             stmt = connection.prepareStatement(sql);
             stmt.setString(1, p.getLogin());
             stmt.setString(2, PasswordHash.createHash(p.getPass()));
@@ -181,11 +182,11 @@ public class Dao {
             System.out.println("ENTRAMOS EN SQLException");
             if (ingresadoDataPlayer) {
                 try {
-                    sql = "DELETE FROM `data_player` WHERE `data_player`.`ID_PLAYER` = ?";
+                    sql = DELETE_FOR_ROLLBACK;
                     stmt = connection.prepareStatement(sql);
                     stmt.setInt(1, lastId);
                     stmt.executeUpdate();
-                    sql="ALTER TABLE `data_player` AUTO_INCREMENT=?";
+                    sql=ALTER_TABLE;
                     stmt = connection.prepareStatement(sql);
                     stmt.setInt(1, lastId);
                     stmt.executeUpdate();
@@ -212,7 +213,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER order by won DESC LIMIT 10";
+            String sql = SELECT_GET_BY_VICTORIES;
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -240,7 +241,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER order by played DESC LIMIT 10";
+            String sql = SELECT_GET_BY_PLAYED;
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -268,7 +269,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT * FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER order by (won/played) DESC LIMIT 10";
+            String sql = SELECT_GET_BY_AVERAGE;
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -296,7 +297,7 @@ public class Dao {
         DBConnector con = new DBConnector();
         try {
             connection = con.getConnection();
-            String sql = "SELECT * FROM LOGIN WHERE login=?";
+            String sql = SELECT_GET_USER_BY_LOGIN;
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, login);
             ResultSet rs = stmt.executeQuery();

@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.mycompany.datapptgame.ClaveComplemento;
 import com.mycompany.datapptgame.User;
+import static constantes.ConstantesConexion.NAME_SERVLET_DB;
+import static constantes.ConstantesConexion.RUTA_SERVLET_DB;
 import static constantes.ConstantesServer.*;
 import static constantes.conexion.ConstantesConexion.*;
 import objetos_seguridad.PasswordHash;
@@ -35,7 +37,7 @@ import static utilities.Utilidades.getClaveCifrado;
  *
  * @author ivanp
  */
-@WebServlet(name = "ServletDB", urlPatterns = {"/ServletDB"})
+@WebServlet(name = NAME_SERVLET_DB, urlPatterns = {RUTA_SERVLET_DB})
 public class ServletDB extends HttpServlet {
 
     /**

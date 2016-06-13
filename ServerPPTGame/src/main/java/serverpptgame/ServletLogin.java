@@ -9,7 +9,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.datapptgame.ClaveComplemento;
 import com.mycompany.datapptgame.User;
+import static constantes.ConstantesConexion.NAME_SERVLET_LOGIN;
+import static constantes.ConstantesConexion.RUTA_SERVLET_LOGIN;
 import static constantes.ConstantesServer.*;
+import static constantes.conexion.ConstantesConexion.NO;
+import static constantes.conexion.ConstantesConexion.SI;
+import static constantes.conexion.ConstantesConexion.URL_LOGIN;
+import static constantes.conexion.ConstantesConexion.USER;
+import static constantes.conexion.ConstantesConexion.UTF_8;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -29,7 +36,7 @@ import static utilities.Utilidades.getClaveCifrado;
  *
  * @author ivanp
  */
-@WebServlet(name = "controllerLogin", urlPatterns = {"/login"})
+@WebServlet(name = NAME_SERVLET_LOGIN, urlPatterns = {RUTA_SERVLET_LOGIN})
 public class ServletLogin extends HttpServlet {
 
     /**
@@ -49,9 +56,9 @@ public class ServletLogin extends HttpServlet {
         try {
             User user = null;
             ObjectMapper mapper = new ObjectMapper();
-            String userToDecode = request.getParameter("user");
+            String userToDecode = request.getParameter(USER);
             System.out.println("USER TO DECODE: " + userToDecode);
-            byte[] base64 = Base64.decodeBase64(userToDecode.getBytes("UTF-8"));
+            byte[] base64 = Base64.decodeBase64(userToDecode.getBytes(UTF_8));
             System.out.println("Base64 " + base64);
             String descifrado = PasswordHash.descifra(base64, getClaveCifrado(request));
             System.out.println("descifrado: " + descifrado);
@@ -68,11 +75,11 @@ public class ServletLogin extends HttpServlet {
             Logger.getLogger(ServletLogin.class.getName()).log(Level.SEVERE, null, ex);
         }
         if (validated) {
-            request.getSession().setAttribute("login", "true");
-            response.getWriter().print("SI");
+            request.getSession().setAttribute(URL_LOGIN, "true");
+            response.getWriter().print(SI);
         } else {
-            request.getSession().setAttribute("login", "false");
-            response.getWriter().print("NO");
+            request.getSession().setAttribute(URL_LOGIN, "false");
+            response.getWriter().print(NO);
         }
     }
 

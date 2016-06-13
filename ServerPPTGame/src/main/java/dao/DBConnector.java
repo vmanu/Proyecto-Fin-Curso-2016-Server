@@ -5,7 +5,7 @@
  */
 package dao;
 
-import config.Configuration;
+import static constantes.ConstantesBaseDatos.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -18,12 +18,7 @@ import java.util.logging.Logger;
  * @author dam2
  */
 public class DBConnector {
-    public static final String DRIVER = "com.mysql.jdbc.Driver";
-    private final String USERNAME="servidor";
-    private final String PASSWORD="server_PPTG@me";
-    private final String HOST="jdbc:mysql://node7553-servidorpptgame.jelastic.cloudhosted.es/";
-    private final String DBNAME="PPTGAME";
-
+    
     public Connection getConnection() throws ClassNotFoundException {
         Class.forName(DRIVER);
         Connection connection = null;

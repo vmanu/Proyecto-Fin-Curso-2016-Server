@@ -5,13 +5,12 @@
  */
 package serverpptgame;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mycompany.datapptgame.User;
+import static constantes.ConstantesConexion.NAME_SERVLET_HASHING_JS;
+import static constantes.ConstantesConexion.RUTA_SERVLET_HASHING_JS;
 import static constantes.ConstantesServer.*;
+import static constantes.conexion.ConstantesConexion.USER;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.logging.Level;
@@ -28,7 +27,7 @@ import org.apache.commons.codec.binary.Base64;
  *
  * @author Victor
  */
-@WebServlet(name = "ServletHashingJS", urlPatterns = {"/ServletHashingJS"})
+@WebServlet(name = NAME_SERVLET_HASHING_JS, urlPatterns = {RUTA_SERVLET_HASHING_JS})
 public class ServletHashingJS extends HttpServlet {
 
     /**
@@ -43,9 +42,9 @@ public class ServletHashingJS extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.addHeader(PERMISSION_ACCESS_JAVASCRIPT, LOCATION_ACCESS_JAVASCRIPT);
-        String op = request.getParameter("op");
+        String op = request.getParameter(OPERATION_OPTION);
         switch (op) {
-            case "claves":
+            case CLAVES:
                 String clave = request.getParameter("clave");
                 String complemento = request.getParameter("complemento");
                 String[] envia = new String[2];
@@ -57,11 +56,11 @@ public class ServletHashingJS extends HttpServlet {
                 }
                 response.getWriter().write(new ObjectMapper().writeValueAsString(envia));
                 break;
-            case "user":
+            case USER:
                 String claveHasheo = request.getParameter("fraseHash");
                 String devuelve = "";
                 try {
-                    devuelve = new String(Base64.encodeBase64(PasswordHash.cifra(request.getParameter("user"), claveHasheo)));
+                    devuelve = new String(Base64.encodeBase64(PasswordHash.cifra(request.getParameter(USER), claveHasheo)));
                 } catch (Exception ex) {
                     Logger.getLogger(ServletHashingJS.class.getName()).log(Level.SEVERE, null, ex);
                 }
