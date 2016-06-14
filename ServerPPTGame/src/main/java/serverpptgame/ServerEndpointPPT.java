@@ -44,7 +44,6 @@ public class ServerEndpointPPT {
 
     private static final long TIEMPO_ESPERA_MILLIS = 30000;
     private EndpointConfig config;
-    //private static final Logger log = Logger.getGlobal();//LoggerFactory.getLogger(ServerEndpointPPT.class);
 
     //<editor-fold defaultstate="collapsed" desc="METODOS WEBSOCKET">
     /**
@@ -63,21 +62,6 @@ public class ServerEndpointPPT {
         p.setNamePlayer(s.getRequestParameterMap().get(USER).get(0));
         s.getUserProperties().put(PLAYER, p);
         s.getUserProperties().put(ESCOGIDO, false);
-        /////////////////////////
-//        Dao dao=new Dao();
-//        dao.insertPlayer(p);
-        System.out.println("OnOpen");
-        System.out.println("player: " + p);
-//        HttpServletRequest request=(HttpServletRequest)s.getUserProperties().get("request");
-//        HttpServletResponse response=(HttpServletResponse)s.getUserProperties().get("response");
-//        try {
-//            request.getRequestDispatcher("/index.html").forward(request, response);
-//        } catch (ServletException ex) {
-//            Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (IOException ex) {
-//            Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-
     }
 
     /**
@@ -89,17 +73,14 @@ public class ServerEndpointPPT {
     @OnClose
     public void onClose(Session s) {
         String seVa = ((Player) s.getUserProperties().get(PLAYER)).getNamePlayer();
-        System.out.println("UNO QUE SE VA: " + seVa);
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         Partida partida = (Partida) s.getUserProperties().get(PARTIDA);
-        System.out.println("Partida " + partida);
         if (partida != null) {
             int i = 0;
             if (partida.getJugadores().get(0).getNamePlayer().equals(seVa)) {
                 i = 1;
             }
-            System.out.println("i vale: " + i);
             cerrarPartidaPorDesconexion(s, partida.getJugadores().get(i).getNamePlayer(), mapper);
         }
     }
@@ -113,66 +94,49 @@ public class ServerEndpointPPT {
      */
     @OnMessage
     public void echoText(String msg, Session s) {
-        System.out.println("MSG es: " + msg);
         try {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             MetaMessage meta = mapper.readValue(msg, new TypeReference<MetaMessage>() {
             });
             Player p = (Player) s.getUserProperties().get(PLAYER);
-            System.out.println("PARTIDA DE: " + p.getNamePlayer() + " es: " + ((Partida) s.getUserProperties().get(PARTIDA)));
             switch (meta.getType()) {
                 case CONEXION:
-                    System.out.println(p.getNamePlayer() + " entra en el caso: " + meta.getType());
                     Player recogida = mapper.readValue(mapper.writeValueAsString(meta.getContent()), new TypeReference<Player>() {
                     });
                     p.setNumberOfRounds(recogida.getNumberOfRounds());
                     p.setTipoJuego(recogida.getTipoJuego());
                     String user = (String) s.getUserProperties().get(USER);
                     if (user == null || (user != null && !user.equals(recogida.getNamePlayer()))) {
-                        System.out.println("Se mete porque nombre no coincide");
                         s.getUserProperties().put(USER, recogida.getNamePlayer());
                     }
                     search(s, p, mapper);
                     break;
                 case PARTIDA:
-                    System.out.println(p.getNamePlayer() + " entra en el caso: " + meta.getType());
                     OpcionJuego opcion = mapper.readValue(mapper.writeValueAsString(meta.getContent()), new TypeReference<OpcionJuego>() {
                     });
-                    System.out.println("opcionJuego: " + opcion.getOpcion() + " de: " + p.getNamePlayer());
                     if (opcion.getResult() != null && opcion.getResult() != Result.EMPATA) {
-                        //HttpSession httpSession = (HttpSession) config.getUserProperties().get("httpSession");
                         ServicesPlayers dbController = new ServicesPlayers();
                         Partida partida = (Partida) s.getUserProperties().get(PARTIDA);
                         if (partida != null) {
                             String nombreRival;
                             if ((!partida.getJugadores().get(0).getNamePlayer().equals(p.getNamePlayer()))) {
-                                //httpSession.setAttribute("player", partida.getJugadores().get(0).getNamePlayer());
                                 nombreRival = partida.getJugadores().get(0).getNamePlayer();
                             } else {
-                                //httpSession.setAttribute("player", partida.getJugadores().get(1).getNamePlayer());
                                 nombreRival = partida.getJugadores().get(1).getNamePlayer();
                             }
-                            System.out.println("el nombre del que envia el mensaje es: " + p.getNamePlayer() + " el nombre del rival es: " + nombreRival);
                             dbController.addRounds(p.getNamePlayer());
                             dbController.addRounds(nombreRival);
                             if (opcion.getResult() == Result.GANA) {
-                                //httpSession.setAttribute("player", p);
                                 dbController.addVictories(p.getNamePlayer());
                             } else {
                                 dbController.addVictories(nombreRival);
                             }
                         }
-//                        ServletDB sdb = new ServletDB();
-//                        HttpServletRequest request = ((HttpServletRequest) config.getUserProperties().get("request"));
-//                        request.setAttribute("op", "update");
-//                        HttpServletResponse response = (HttpServletResponse) config.getUserProperties().get("response");
-//                        sdb.processRequest(request, response);
                     }
                     enviarEleccion(p.getNamePlayer(), opcion, s, mapper, damePartida(s));
                     break;
                 case DESCONEXION:
-                    System.out.println(p.getNamePlayer() + " entra en el caso: " + meta.getType());
                     Partida partida = (Partida) s.getUserProperties().get(PARTIDA);
                     if (partida != null) {
                         int i = 0;
@@ -212,7 +176,6 @@ public class ServerEndpointPPT {
      */
     public void enviarEleccion(String nombre, OpcionJuego opcion, Session s, ObjectMapper mapper, Partida partida) {
         String nombreObjetivo;
-        System.out.println("VEAMOS: " + nombre + " buscando y encuentra: " + partida);
         if (partida != null) {
             if (partida.getJugadores().get(0).getNamePlayer().equals(nombre)) {
                 nombreObjetivo = partida.getJugadores().get(1).getNamePlayer();
@@ -232,7 +195,6 @@ public class ServerEndpointPPT {
                     try {
                         mmString = mapper.writeValueAsString(mm);
                         sesiones.get(i).getBasicRemote().sendText(mmString);
-                        System.out.println("Ha entrado y enviado la respuesta");
                     } catch (JsonProcessingException ex) {
                         Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (IOException ex) {
@@ -240,8 +202,6 @@ public class ServerEndpointPPT {
                     }
                 }
             }
-        } else {
-            System.out.println("PARTIDA ES NULL EN \"enviarEleccion\"");
         }
     }
 
@@ -256,7 +216,6 @@ public class ServerEndpointPPT {
     public void search(Session ses, Player n, ObjectMapper mapper) {
         Partida p = null;
         boolean sal = false;
-        //ArrayList<Session> sessions=new ArrayList(ses.getOpenSessions());
         Iterator it = ses.getOpenSessions().iterator();
         long timeInicial = System.currentTimeMillis();
         while (!sal && (System.currentTimeMillis() - timeInicial < TIEMPO_ESPERA_MILLIS)) {
@@ -268,27 +227,20 @@ public class ServerEndpointPPT {
             Partida game = (Partida) sessions.getUserProperties().get(PARTIDA);
             if (compruebaSiNoNombreEnPartida(game, n.getNamePlayer())) {
                 try {
-                    /*if(i==sessions.size()){
-                     i=0;
-                     sessions=new ArrayList(ses.getOpenSessions());
-                     }*/
                     Player player = (Player) sessions.getUserProperties().get(PLAYER);
                     if (encuentraPartida(player, n) && !((boolean) ses.getUserProperties().get("escogido"))) {
                         ses.getUserProperties().put("escogido", true);
                         if (!(boolean) sessions.getUserProperties().get("escogido")) {
                             sessions.getUserProperties().put("escogido", true);
                             if (n.getNumberOfRounds() == RoundsNumber.ANY) {
-                                System.out.println("ENTRA EN QUE EL PRIMERO ES ANY");
                                 boolean ambosRandoms = false;
                                 if (comparaDosAnyGameTypes(player.getTipoJuego(), n.getTipoJuego())) {
                                     //AMBOS SON RANDOMS
-                                    System.out.println("EN AMBOS SON RANDOMS");
                                     n.setNumberOfRounds(RoundsNumber.values()[((int) (Math.random() * 3))]);
                                     n.setTipoJuego(GameType.values()[((int) (Math.random() * 3))]);
                                     ambosRandoms = true;
                                 } else {
                                     //SOLO n ES RANDOM
-                                    System.out.println("ENTRA EN QUE EL SOLO EL PRIMERO ES RANDOM");
                                     n.setNumberOfRounds(player.getNumberOfRounds());
                                     n.setTipoJuego(player.getTipoJuego());
                                 }
@@ -296,14 +248,12 @@ public class ServerEndpointPPT {
                                 mm.setType(TypeMessage.CONFIGURACION);
                                 mm.setContent(n);
                                 String mmString = mapper.writeValueAsString(mm);
-                                System.out.println("EN AL MENOS UNO ES RANDOM, EL OBJETO ES: "+mmString);
                                 ses.getBasicRemote().sendText(mmString);
                                 if (ambosRandoms) {
                                     sessions.getBasicRemote().sendText(mmString);
                                 }
                             } else if (player.getNumberOfRounds() == RoundsNumber.ANY) {
                                 //SOLO player ES RANDOM
-                                System.out.println("ENTRA EN SOLO EL SEGUNDO ES RANDOM");
                                 player.setNumberOfRounds(n.getNumberOfRounds());
                                 player.setTipoJuego(n.getTipoJuego());
                                 MetaMessage mm = new MetaMessage();
@@ -330,8 +280,6 @@ public class ServerEndpointPPT {
                             ses.getUserProperties().put(PLAYER, n);
                             sessions.getUserProperties().put(PLAYER, player);
                             sessions.getUserProperties().put(PARTIDA, p);
-                            System.out.println("SE HA UNIDO A LOS SIGUIENTES JUGADORES: " + player.getNamePlayer() + " y " + n.getNamePlayer());
-                            System.out.println(n.getNamePlayer() + " PARTIDA ES: " + ses.getUserProperties().get(PARTIDA));
                         } else {
                             ses.getUserProperties().put(ESCOGIDO, false);
                         }
@@ -341,8 +289,6 @@ public class ServerEndpointPPT {
                 }
             } else {
                 sal = true;
-                System.out.println("PARTIDA DE: " + n.getNamePlayer() + " está USADA");
-                System.out.println(n.getNamePlayer() + " PARTIDA ES: " + ses.getUserProperties().get(PARTIDA));
             }
         }
         if (!sal) {
@@ -368,11 +314,8 @@ public class ServerEndpointPPT {
      */
     public void cerrarPartidaPorDesconexion(Session s, String nombrePareja, ObjectMapper mapper) {
         boolean sal = false;
-        System.out.println("EN CERRARPARTIDADESCON: " + nombrePareja);
         ArrayList<Session> sessions = new ArrayList(s.getOpenSessions());
-        System.out.println("tamaño de sessions: " + sessions.size());
         for (int i = 0; i < sessions.size() && !sal; i++) {
-            System.out.println("session[" + i + "]: " + ((Player) sessions.get(i).getUserProperties().get(PLAYER)).getNamePlayer());
             if (((Player) sessions.get(i).getUserProperties().get(PLAYER)).getNamePlayer().equals(nombrePareja)) {
                 try {
                     MetaMessage mt = new MetaMessage();
@@ -380,7 +323,6 @@ public class ServerEndpointPPT {
                     sessions.get(i).getBasicRemote().sendText(mapper.writeValueAsString(mt));
                     sessions.get(i).getUserProperties().put(PARTIDA, null);
                     sal = true;
-
                 } catch (IOException ex) {
                     Logger.getLogger(ServerEndpointPPT.class.getName()).log(Level.SEVERE, null, ex);
                 }

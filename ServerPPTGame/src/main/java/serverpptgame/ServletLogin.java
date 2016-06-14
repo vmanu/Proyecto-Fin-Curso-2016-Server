@@ -7,7 +7,6 @@ package serverpptgame;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mycompany.datapptgame.ClaveComplemento;
 import com.mycompany.datapptgame.User;
 import static constantes.ConstantesConexion.NAME_SERVLET_LOGIN;
 import static constantes.ConstantesConexion.RUTA_SERVLET_LOGIN;
@@ -18,8 +17,6 @@ import static constantes.conexion.ConstantesConexion.URL_LOGIN;
 import static constantes.conexion.ConstantesConexion.USER;
 import static constantes.conexion.ConstantesConexion.UTF_8;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -57,20 +54,14 @@ public class ServletLogin extends HttpServlet {
             User user = null;
             ObjectMapper mapper = new ObjectMapper();
             String userToDecode = request.getParameter(USER);
-            System.out.println("USER TO DECODE: " + userToDecode);
             byte[] base64 = Base64.decodeBase64(userToDecode.getBytes(UTF_8));
-            System.out.println("Base64 " + base64);
             String descifrado = PasswordHash.descifra(base64, getClaveCifrado(request));
-            System.out.println("descifrado: " + descifrado);
             user = mapper.readValue(descifrado, new TypeReference<User>() {
             });
-            System.out.println(user.getLogin() + " --- " + user.getPass());
             User u = sp.getUserByLogin(user.getLogin());
             if (u != null) {
                 validated = PasswordHash.validatePassword(user.getPass(), u.getPass());
             }
-            System.out.println("VALIDATED EN CONTROLLER LOGIN " + validated);
-            //response.setContentType("text/html;charset=UTF-8");
         } catch (Exception ex) {
             Logger.getLogger(ServletLogin.class.getName()).log(Level.SEVERE, null, ex);
         }

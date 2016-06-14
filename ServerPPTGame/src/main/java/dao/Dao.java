@@ -113,7 +113,6 @@ public class Dao {
     }
 
     public boolean insertPlayer(User p) {
-        System.out.println("ENTRAMOS EN INSERT");
         Connection connection = null;
         int ins = 0, insDATAP;
         boolean ingresadoDataPlayer = false;
@@ -124,62 +123,26 @@ public class Dao {
         int lastId = -1;
         try {
             connection = con.getConnection();
-            //NO INSERTAR SI YA EXISTE
-            //SI NO EXISTE, INSERTAR EN DATA_PLAYER Y LUEGO INSERTAR EN LOGIN
-//            String sql = "select login from LOGIN where login=?";
             sql = SELECT_INSERT_PLAYERS;
             stmt = connection.prepareStatement(sql);
             rs = stmt.executeQuery();
-//            ArrayList<String> loginsEnBD = new ArrayList();
-//            if(rs.getString("login")!=null){
-//                
-//            }
-//            while (rs.next()) {
-//                String login = rs.getString("login");
-//                loginsEnBD.add(login);
-//            }
-//            if (loginsEnBD.contains(p.getNamePlayer())) {
-//                //YA EXISTE!!
-//            } else {
-//            connection.setAutoCommit(false);
             sql = INSERT_DATA_PLAYER;
             stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             insDATAP = stmt.executeUpdate();
-            System.out.println("insDATAP " + insDATAP);
-//            sql = "SELECT LAST_INSERT_ID()";
-//            rs = stmt.executeQuery(sql);
-//            int lastId = rs.getInt(1);
-            
             rs = stmt.getGeneratedKeys();
             if (rs.next()) {
                 lastId = rs.getInt(1);
             }
             ingresadoDataPlayer = true;
-            System.out.println("lastID "+lastId);
             sql = INSERT_PLAYER;
             stmt = connection.prepareStatement(sql);
             stmt.setString(1, p.getLogin());
             stmt.setString(2, PasswordHash.createHash(p.getPass()));
             stmt.setInt(3, lastId);
             ins = stmt.executeUpdate();
-            System.out.println("NO PETA CHUMACHO");
-//            if (ins == 0) {
-//                System.out.println("ENTRAMOS EN CERO");
-//                connection.rollback();
-//            }
-//            }
-
-            //stmt.setString(2, p.getPass());
-            //STEP 5: Extract data from result set
         } catch (ClassNotFoundException | NoSuchAlgorithmException | InvalidKeySpecException ex) {
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-//            try {
-//                connection.rollback();
-//            } catch (SQLException ex1) {
-//                Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex1);
-//            }
-            System.out.println("ENTRAMOS EN SQLException");
             if (ingresadoDataPlayer) {
                 try {
                     sql = DELETE_FOR_ROLLBACK;
@@ -191,17 +154,11 @@ public class Dao {
                     stmt.setInt(1, lastId);
                     stmt.executeUpdate();
                 } catch (SQLException ex1) {
-                    System.out.println("ENTRAMOS EN SQLException Interno");
                     Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex1);
                 }
             }
             Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-//            try {
-//                connection.setAutoCommit(true);
-//            } catch (SQLException ex) {
-//                Logger.getLogger(Dao.class.getName()).log(Level.SEVERE, null, ex);
-//            }
             con.cerrarConexion(connection);
         }
         return ins != 0;
@@ -218,10 +175,8 @@ public class Dao {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 String name = rs.getString("login");
-                //String pass=rs.getString("pass");
                 int victories = rs.getInt("won");
                 int numPartidas = rs.getInt("played");
-                //Player p = new Player(name, pass, victories);
                 Player p = new Player(name, numPartidas, victories);
                 players.add(p);
             }
@@ -246,10 +201,8 @@ public class Dao {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 String name = rs.getString("login");
-                //String pass=rs.getString("pass");
                 int victories = rs.getInt("won");
                 int numPartidas = rs.getInt("played");
-                //Player p = new Player(name, pass, victories);
                 Player p = new Player(name, numPartidas, victories);
                 players.add(p);
             }
@@ -274,9 +227,7 @@ public class Dao {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 String name = rs.getString("login");
-                //String pass=rs.getString("pass");
                 int victories = rs.getInt("won");
-                //Player p = new Player(name, pass, victories);
                 int numPartidas = rs.getInt("played");
                 Player p = new Player(name, numPartidas, victories);
                 players.add(p);

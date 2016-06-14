@@ -40,12 +40,10 @@ public class ServletSeguridad extends HttpServlet {
             throws ServletException, IOException {
         response.addHeader(PERMISSION_ACCESS_JAVASCRIPT, LOCATION_ACCESS_JAVASCRIPT);
         SeguridadDAO dao = new SeguridadDAO();
-        //CORRECCION: AQUI FALTARIA CONTROLAR QUE EL USUARIO HA HECHO LOGIN
         ArrayList<String> complementos = (ArrayList<String>) request.getSession().getAttribute("compls");
         ArrayList<String> keys = (ArrayList<String>) request.getSession().getAttribute("keys");
         ArrayList<String> keysBD = dao.getClaves();
         ArrayList<String> complementosBD = dao.getComplementos();
-        System.out.println("COMPLEMENTOS BD " + complementosBD);
         if (keys == null || keys.size() == 0 || complementos == null || complementos.size() == 0) {
             if (keys == null) {
                 keys = new ArrayList<>();
@@ -53,7 +51,6 @@ public class ServletSeguridad extends HttpServlet {
             if (complementos == null) {
                 complementos = new ArrayList<>();
             }
-
             for (int i = 0; i < 5; i++) {
                 boolean buscandoKey = true;
                 boolean buscandoCompl = true;
@@ -68,13 +65,10 @@ public class ServletSeguridad extends HttpServlet {
                     int randomComplementos = (int) (Math.random() * (complementosBD.size()));
                     if (!complementos.contains(complementosBD.get(randomComplementos))) {
                         complementos.add(complementosBD.get(randomComplementos));
-                        System.out.println("complementos added " + complementos);
                         buscandoCompl = false;
                     }
                 }
             }
-            System.out.println("CLAVES " + keys);
-            System.out.println("COMPLEMENTOS " + complementos);
             ClaveComplemento cc = new ClaveComplemento();
             cc.setClaves(keys);
             cc.setComplementos(complementos);

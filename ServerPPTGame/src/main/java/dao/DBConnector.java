@@ -11,7 +11,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//import org.sqlite.SQLiteConfig;
 
 /**
  *
@@ -23,13 +22,8 @@ public class DBConnector {
         Class.forName(DRIVER);
         Connection connection = null;
         try {
-            System.out.println("Before get config... ");
-            //String url = HOST+DBNAME;
-            //casa: 192.168.1.104  //portatil-victor: 192.168.1.56
             String url = HOST+DBNAME;
-            System.out.println("Connecting to... "+url);
             connection=DriverManager.getConnection(url,USERNAME,PASSWORD);
-            System.out.println("Conectado= "+connection);
         } catch (SQLException ex) {
             Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
         }

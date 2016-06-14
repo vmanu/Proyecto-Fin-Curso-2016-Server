@@ -32,8 +32,6 @@ public class Utilidades {
         String keyHasheada = (String) request.getParameter(CLAVE_HASHEADA);
         String complementoHasheado = (String) request.getParameter(COMPLEMENTO_HASHEADO);
         ClaveComplemento cc = (ClaveComplemento) request.getSession().getAttribute("keysComplements");
-        System.out.println("mapper: "+mapper+" o request: "+request);
-        System.out.println(" o el parameter "+request.getParameter("claveComplemento"));
         if(cc==null){
             try {
                 cc=mapper.readValue(request.getParameter("claveComplemento"), new TypeReference<ClaveComplemento>() {});
@@ -75,7 +73,6 @@ public class Utilidades {
         if (encontradoCompl && encontradaKey) {
             paraCifrar = key + complemento;
         }
-        System.out.println("PARA CIFRAR ES: "+paraCifrar);
         return paraCifrar;
     }
 }

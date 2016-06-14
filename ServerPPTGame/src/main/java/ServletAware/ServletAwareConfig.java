@@ -22,11 +22,5 @@ public class ServletAwareConfig extends ServerEndpointConfig.Configurator {
         config.getUserProperties().put("httpSession", httpSession);
         config.getUserProperties().put("request", request);
         config.getUserProperties().put("response", response);
-        /*
-        if(httpSession.getAttribute("login")!=null){
-            config.getUserProperties().put("login", true);
-            config.getUserProperties().put("player", true);
-        }
-        */
     }
 }

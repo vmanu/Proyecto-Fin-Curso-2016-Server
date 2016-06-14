@@ -10,10 +10,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.datapptgame.Player;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -21,7 +17,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.mycompany.datapptgame.ClaveComplemento;
 import com.mycompany.datapptgame.User;
 import static constantes.ConstantesConexion.NAME_SERVLET_DB;
 import static constantes.ConstantesConexion.RUTA_SERVLET_DB;
@@ -30,7 +25,6 @@ import static constantes.conexion.ConstantesConexion.*;
 import objetos_seguridad.PasswordHash;
 import org.apache.commons.codec.binary.Base64;
 import services.ServicesPlayers;
-import utilities.Utilidades;
 import static utilities.Utilidades.getClaveCifrado;
 
 /**
@@ -63,33 +57,16 @@ public class ServletDB extends HttpServlet {
             switch (op) {
                 case URL_AGREGAR_USUARIO:
                     String usuarioRaw = request.getParameter(USER);
-                    System.out.println("usuarioRAW " + usuarioRaw);
                     byte[] base64 = Base64.decodeBase64(usuarioRaw.getBytes(UTF_8));
-                    System.out.println("Base64 " + base64);
                     String descifrado = PasswordHash.descifra(base64, getClaveCifrado(request));
-                    System.out.println("descifrado: " + descifrado);
                     u = mapper.readValue(descifrado, new TypeReference<User>() {
                     });
-                    System.out.println("player dice ser: " + u);
                     if (sp.insertPlayer(u)) {
                         response.getWriter().write(SI);
                     } else {
                         response.getWriter().write(NO);
                     }
                     break;
-//                case "addRounds":
-//                    p = (Player) request.getSession().getAttribute("player");
-//                    sp.addRounds(p.getNamePlayer());
-//                    break;
-//                case "addVictories":
-//                    p = (Player) request.getSession().getAttribute("player");
-//                    sp.addVictories(p.getNamePlayer());
-//                    break;
-//                case "get":
-//                    request.setAttribute("players", sp.getPlayers());
-//                    response.getWriter().write("EL GET DEVUELVE "+sp.getPlayers());
-//                    System.out.println("Saliendo de get");
-//                    break;
                 case URL_GET_BY_VICTORIES:
                     response.getWriter().write(mapper.writeValueAsString(sp.getPlayersByVictories()));
                     break;

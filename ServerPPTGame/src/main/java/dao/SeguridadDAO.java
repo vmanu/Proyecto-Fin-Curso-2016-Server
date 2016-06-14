@@ -30,7 +30,6 @@ public class SeguridadDAO {
             String sql = SELECT_CLAVES_SECURITY;
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
-            //STEP 5: Extract data from result set
             while (rs.next()) {
                 String pass=rs.getString("CLAVE");
                 keys.add(pass);
@@ -56,7 +55,6 @@ public class SeguridadDAO {
             String sql = SELECT_COMPLEMENTOS_SECURITY;
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
-            //STEP 5: Extract data from result set
             while (rs.next()) {
                 String complemento=rs.getString("COMPLEMENTO");
                 compls.add(complemento);
