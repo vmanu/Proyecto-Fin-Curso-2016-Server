@@ -10,7 +10,7 @@ package constantes;
  * @author Victor
  */
 public class ConstantesServer {
-    public static final String LOCATION_ACCESS_JAVASCRIPT="http://www.pptgame.esy.es/";
+    public static final String LOCATION_ACCESS_JAVASCRIPT="*";
     public static final String PERMISSION_ACCESS_JAVASCRIPT="Access-Control-Allow-Origin";
     public static final String OPERATION_OPTION="op";
     public static final String CLAVES="claves";
