@@ -26,7 +26,7 @@ public class DBConnector {
             System.out.println("Before get config... ");
             //String url = HOST+DBNAME;
             //casa: 192.168.1.104  //portatil-victor: 192.168.1.56
-            String url = "jdbc:mysql://192.168.1.104/"+DBNAME;
+            String url = HOST+DBNAME;
             System.out.println("Connecting to... "+url);
             connection=DriverManager.getConnection(url,USERNAME,PASSWORD);
             System.out.println("Conectado= "+connection);

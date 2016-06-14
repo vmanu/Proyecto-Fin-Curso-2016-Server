@@ -13,7 +13,7 @@ public class ConstantesBaseDatos {
     public static final String DRIVER = "com.mysql.jdbc.Driver";
     public static final String USERNAME="servidor";
     public static final String PASSWORD="server_PPTG@me";
-    public static final String HOST="jdbc:mysql://node7553-servidorpptgame.jelastic.cloudhosted.es/";
+    public static final String HOST="jdbc:mysql://node7553-servidorpptgame.jelastic.cloudhosted.es/";//"jdbc:mysql://node7553-servidorpptgame.jelastic.cloudhosted.es/";
     public static final String DBNAME="PPTGAME";
     public static final String SELECT_ADD_VICTORIES="SELECT won FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER and log.LOGIN=?";
     public static final String SELECT_ADD_ROUNDS="SELECT played FROM DATA_PLAYER dp, LOGIN log where dp.ID_PLAYER=log.ID_PLAYER and log.LOGIN=?";
